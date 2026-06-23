@@ -44,7 +44,7 @@ h1,h2,h3{font-family:'Archivo',sans-serif;line-height:1}
   .brand span{display:none}
   .nav-cta{padding:.55rem .9rem;font-size:.72rem}
   .section{padding-left:1.3rem;padding-right:1.3rem}
-  .hero{padding-left:1.3rem;padding-right:1.3rem}
+  .hero-in{padding-left:1.3rem;padding-right:1.3rem}
 }
 
 /* ---------- buttons ---------- */
@@ -80,7 +80,7 @@ h1,h2,h3{font-family:'Archivo',sans-serif;line-height:1}
   -webkit-mask-image:radial-gradient(ellipse 100% 90% at 58% 42%,#000 0%,transparent 82%);mask-image:radial-gradient(ellipse 100% 90% at 58% 42%,#000 0%,transparent 82%)}
 .hero-in{max-width:1240px;margin:0 auto;width:100%;position:relative;z-index:3}
 .hero-copy{max-width:40rem}
-@media(max-width:980px){.hero{padding:6.5rem 1.5rem 3rem}}
+@media(max-width:980px){.hero{display:block;min-height:auto;padding:0}.hero-in{padding:7.5rem 1.5rem 2.5rem}}
 .eyebrow{font-family:'Space Mono',monospace;font-size:.9rem;letter-spacing:.26em;text-transform:uppercase;color:var(--blue);display:inline-flex;align-items:center;gap:.7rem;margin-bottom:1.6rem}
 .eyebrow::before{content:'';width:34px;height:2px;background:var(--gold)}
 @media(max-width:980px){.eyebrow{justify-content:flex-start}}
@@ -112,7 +112,7 @@ h1,h2,h3{font-family:'Archivo',sans-serif;line-height:1}
 .mq-item.first{color:var(--blue);font-weight:700}
 .mq-sep{color:var(--gold);padding:0 1.9rem;font-size:1.1rem}
 @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-@media(max-width:980px){.ticker{position:static;margin-top:2.5rem}}
+@media(max-width:980px){.ticker{position:relative;z-index:3;margin:0}}
 
 /* ---------- generic section ---------- */
 .section{padding:clamp(4.5rem,9vw,7rem) 2rem;position:relative}

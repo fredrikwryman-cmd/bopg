@@ -245,11 +245,11 @@ h1,h2,h3{font-family:'Archivo',sans-serif;line-height:1}
 
 /* === fore/efter slider CSS === */
 .ba-section{padding-top:clamp(3.5rem,7vw,5.5rem);padding-bottom:clamp(3.5rem,7vw,5.5rem)}
-.ba-tabs{display:flex;gap:.6rem;margin:1.9rem 0 1.5rem;flex-wrap:wrap;justify-content:center}
+.ba-tabs{display:flex;gap:.6rem;margin:1.9rem 0 1.5rem;flex-wrap:wrap;justify-content:flex-start}
 .ba-tab{font-family:'Space Mono',monospace;font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;padding:.62rem 1.15rem;border:1px solid var(--line);background:#fff;color:var(--slate);border-radius:2px;cursor:pointer;transition:all .25s}
 .ba-tab:hover{border-color:var(--ink);color:var(--ink)}
 .ba-tab.active{background:var(--ink);color:#fff;border-color:var(--ink)}
-.ba-layout{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(250px,1fr);gap:2.4rem;align-items:center;margin-top:1.4rem}
+.ba-layout{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(280px,1fr);gap:2.4rem;align-items:stretch;margin-top:1.4rem}
 @media(max-width:860px){.ba-layout{grid-template-columns:1fr;gap:1.8rem}}
 .ba{position:relative;border:1.5px solid var(--ink);border-radius:5px;overflow:hidden;box-shadow:0 34px 70px -34px rgba(34,42,51,.55)}
 .ba-stage{position:relative;aspect-ratio:4/3;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;cursor:ew-resize;background:var(--paper-2)}
@@ -263,11 +263,19 @@ h1,h2,h3{font-family:'Archivo',sans-serif;line-height:1}
 .ba-handle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:#fff;color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:1.15rem;cursor:ew-resize;box-shadow:0 4px 16px rgba(0,0,0,.38);border:2px solid var(--gold)}
 .ba-handle:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 .ba-hint{margin-top:1rem;font-family:'Space Mono',monospace;font-size:.72rem;letter-spacing:.1em;color:var(--slate);opacity:.75;display:flex;align-items:center;gap:.5rem}
-.ba-info{display:flex;flex-direction:column;align-items:flex-start}
+.ba-info{display:flex;flex-direction:column;align-items:flex-start;height:100%}
 .ba-info-ey{font-family:'Space Mono',monospace;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--blue);display:inline-flex;align-items:center;gap:.6rem;margin-bottom:.9rem}
 .ba-info-ey::before{content:'';width:24px;height:2px;background:var(--gold)}
 .ba-info h3{font-family:'Archivo',sans-serif;font-weight:900;font-size:clamp(1.6rem,2.4vw,2.1rem);text-transform:uppercase;color:var(--ink);line-height:1.05;margin-bottom:.7rem}
-.ba-info-desc{font-size:1rem;line-height:1.65;color:var(--slate);margin-bottom:1.6rem}
+.ba-info-desc{font-size:.98rem;line-height:1.6;color:var(--slate);margin-bottom:1.2rem}
+.ba-form{display:flex;flex-direction:column;gap:.65rem;width:100%;flex:1 1 auto}
+.ba-form .ba-field{display:flex;flex-direction:column}
+.ba-form .ba-field.grow{flex:1 1 auto}
+.ba-form label{font-family:'Space Mono',monospace;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem}
+.ba-form input,.ba-form textarea{width:100%;background:#fff;border:1px solid var(--line);border-radius:3px;padding:.6rem .8rem;font-family:'Manrope',sans-serif;font-size:.94rem;color:var(--ink);transition:border-color .25s,box-shadow .25s}
+.ba-form input:focus,.ba-form textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(31,78,150,.12)}
+.ba-form textarea{resize:vertical;min-height:60px;height:100%;flex:1 1 auto}
+.ba-form .btn{margin-top:.25rem;justify-content:center}
 </style>
 </head>
 <body>
@@ -361,7 +369,13 @@ h1,h2,h3{font-family:'Archivo',sans-serif;line-height:1}
         <span class="ba-info-ey" id="ba-info-ey">Förvandling 01 / 06</span>
         <h3 id="ba-info-title">Badrum</h3>
         <p class="ba-info-desc" id="ba-info-desc"></p>
-        <a class="btn btn-primary" href="#kontakt" data-magnetic><span class="fill"></span><span class="lbl">Begär offert</span><span class="arrow">&rarr;</span></a>
+        <form class="ba-form" onsubmit="return false">
+          <div class="ba-field"><label>Namn</label><input type="text" placeholder="För- och efternamn"></div>
+          <div class="ba-field"><label>Telefon</label><input type="tel" placeholder="070-000 00 00"></div>
+          <div class="ba-field"><label>E-post</label><input type="email" placeholder="namn@exempel.se"></div>
+          <div class="ba-field grow"><label>Beskriv ditt projekt</label><textarea placeholder="T.ex. vad du vill ha gjort, ungefärlig storlek och tidsram..."></textarea></div>
+          <button class="btn btn-primary" type="submit" data-magnetic><span class="fill"></span><span class="lbl">Begär offert</span><span class="arrow">&rarr;</span></button>
+        </form>
       </aside>
     </div>
   </div>

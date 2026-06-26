@@ -1,0 +1,71 @@
+---
+const {
+  title = 'Bygg & Projektgruppen i Stockholm AB',
+  description = 'Bygg och Projektgruppen i Stockholm AB — samlad byggpartner i Stockholm med bas i Åkersberga. Nybyggnation, renovering, entreprenad, el & VVS, mark, plåt och smide.',
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const siteRoot = new URL(import.meta.env.BASE_URL, Astro.site).href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'GeneralContractor',
+  '@id': siteRoot,
+  name: 'Bygg och Projekt Gruppen i Stockholm AB',
+  alternateName: 'Bygg & Projektgruppen',
+  url: siteRoot,
+  telephone: '+46704629943',
+  email: 'Andreas@byggoprojektgruppen.se',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Sågvägen 33',
+    postalCode: '184 40',
+    addressLocality: 'Åkersberga',
+    addressRegion: 'Stockholms län',
+    addressCountry: 'SE',
+  },
+  areaServed: [
+    { '@type': 'City', name: 'Stockholm' },
+    { '@type': 'City', name: 'Åkersberga' },
+  ],
+  identifier: { '@type': 'PropertyValue', name: 'Organisationsnummer', value: '559576-5198' },
+  founder: { '@type': 'Person', name: 'Andreas Berndt Dahlgren' },
+};
+---
+<!DOCTYPE html>
+<html lang="sv">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#222A33" />
+    <meta name="robots" content="index, follow" />
+
+    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
+
+    <title>{title}</title>
+
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bygg & Projektgruppen" />
+    <meta property="og:locale" content="sv_SE" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+
+    <style is:global>
+      @import '../styles/global.css';
+    </style>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

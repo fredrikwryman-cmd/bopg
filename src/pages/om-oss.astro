@@ -1,0 +1,29 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/layout/Navbar.jsx';
+import Footer from '../components/layout/Footer.jsx';
+import PageHeader from '../components/pages/PageHeader.jsx';
+import AboutSection from '../components/home/AboutSection.jsx';
+import ProcessSection from '../components/home/ProcessSection.jsx';
+import ContactSection from '../components/contact/ContactSection.jsx';
+---
+
+<Layout
+  title="Om oss | Bygg & Projektgruppen i Stockholm AB"
+  description="Bygg och Projektgruppen är en samlad byggpartner i Stockholmsområdet med bas i Åkersberga. Bakom gruppen står Andreas Dahlgren med över 20 års erfarenhet."
+>
+  <Navbar client:idle />
+  <main>
+    <PageHeader
+      client:load
+      eyebrow="Om gruppen"
+      title="En samlad byggpartner"
+      subtitle="Kvalitet, ordning och en rak, ärlig dialog — oavsett projektets storlek. Vi vill vara den enda kontakt du behöver."
+      crumbs={[{ label: 'Om oss' }]}
+    />
+    <AboutSection client:visible withLink={false} />
+    <ProcessSection client:visible />
+    <ContactSection client:visible subject="Ny förfrågan från byggoprojektgruppen.se (Om oss)" />
+  </main>
+  <Footer />
+</Layout>

@@ -1,0 +1,31 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/layout/Navbar.jsx';
+import Footer from '../components/layout/Footer.jsx';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout
+  title="Sidan hittades inte | Bygg & Projektgruppen"
+  description="Sidan du letar efter finns inte."
+>
+  <Navbar client:idle />
+  <main>
+    <section class="page-header" style="min-height:70vh;display:flex;align-items:center">
+      <div class="blueprint-bg"></div>
+      <div class="ph-in" style="text-align:center;width:100%">
+        <span class="mono" style="font-size:clamp(4rem,16vw,9rem);font-weight:700;color:var(--gold-lt);display:block;line-height:1">404</span>
+        <h1>Sidan kunde inte hittas</h1>
+        <p class="ph-sub" style="margin-left:auto;margin-right:auto">
+          Sidan du letar efter har flyttat eller finns inte längre. Vi lotsar dig vidare.
+        </p>
+        <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem">
+          <a class="btn btn-primary" href={base}><span class="fill"></span><span class="lbl">Till startsidan</span><span class="arrow">&rarr;</span></a>
+          <a class="btn btn-ghost" href={base + 'kontakt'} style="color:#fff;border-color:rgba(255,255,255,.45)">Kontakta oss</a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>

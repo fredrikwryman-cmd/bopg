@@ -1,0 +1,29 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/layout/Navbar.jsx';
+import Footer from '../components/layout/Footer.jsx';
+import PageHeader from '../components/pages/PageHeader.jsx';
+import ServicesOverview from '../components/home/ServicesOverview.jsx';
+import ProcessSection from '../components/home/ProcessSection.jsx';
+import ContactSection from '../components/contact/ContactSection.jsx';
+---
+
+<Layout
+  title="Tjänster | Bygg & Projektgruppen i Stockholm AB"
+  description="Bygg, renovering, nybyggnation, ytskikt, el & VVS, mark, plåt och smide. Bygg & Projektgruppen är en samlad byggpartner i Stockholmsområdet med bas i Åkersberga."
+>
+  <Navbar client:idle />
+  <main>
+    <PageHeader
+      client:load
+      eyebrow="Vad vi gör"
+      title="Våra tjänster"
+      subtitle="Från grund till färdig byggnad — och allt däremellan. Klicka på en tjänst för att läsa mer om vad som ingår."
+      crumbs={[{ label: 'Tjänster' }]}
+    />
+    <ServicesOverview client:visible />
+    <ProcessSection client:visible />
+    <ContactSection client:visible subject="Ny förfrågan från byggoprojektgruppen.se (Tjänster)" />
+  </main>
+  <Footer />
+</Layout>

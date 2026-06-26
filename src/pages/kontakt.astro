@@ -1,0 +1,25 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/layout/Navbar.jsx';
+import Footer from '../components/layout/Footer.jsx';
+import PageHeader from '../components/pages/PageHeader.jsx';
+import ContactSection from '../components/contact/ContactSection.jsx';
+---
+
+<Layout
+  title="Kontakt | Bygg & Projektgruppen i Stockholm AB"
+  description="Kontakta Bygg & Projektgruppen i Åkersberga. Berätta om ditt projekt så återkommer vi med en offert så snart vi kan."
+>
+  <Navbar client:idle />
+  <main>
+    <PageHeader
+      client:load
+      eyebrow="Kontakt"
+      title="Hör av dig"
+      subtitle="Berätta om ditt projekt så återkommer vi så snart vi kan. Vill du ha vår prislista för löpande arbeten? Säg till."
+      crumbs={[{ label: 'Kontakt' }]}
+    />
+    <ContactSection client:visible subject="Ny förfrågan från byggoprojektgruppen.se (Kontakt)" />
+  </main>
+  <Footer />
+</Layout>

@@ -1,0 +1,27 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/layout/Navbar.jsx';
+import Footer from '../components/layout/Footer.jsx';
+import HeroSection from '../components/home/HeroSection.jsx';
+import ServicesOverview from '../components/home/ServicesOverview.jsx';
+import BeforeAfterSection from '../components/home/BeforeAfterSection.jsx';
+import ProcessSection from '../components/home/ProcessSection.jsx';
+import AboutSection from '../components/home/AboutSection.jsx';
+import ContactSection from '../components/contact/ContactSection.jsx';
+---
+
+<Layout
+  title="Bygg & Projektgruppen i Stockholm AB | Samlad byggpartner i Åkersberga"
+  description="Bygg och Projektgruppen i Stockholm AB — samlad byggpartner i Stockholm med bas i Åkersberga. Nybyggnation, renovering, entreprenad, el & VVS, mark, plåt och smide."
+>
+  <Navbar client:idle />
+  <main>
+    <HeroSection client:load />
+    <ServicesOverview client:visible />
+    <BeforeAfterSection client:visible />
+    <ProcessSection client:visible />
+    <AboutSection client:visible />
+    <ContactSection client:visible />
+  </main>
+  <Footer />
+</Layout>

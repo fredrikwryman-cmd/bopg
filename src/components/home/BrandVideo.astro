@@ -1,10 +1,8 @@
 ---
-// Dekorativ roterande 3D-logo. Videon har en svagt GRÅ bakgrund (uppmätt ur
-// postern: topp ~#dcdcdc, botten ~#e5e5e5, lätt vertikal gradient). Sektionen
-// bakom videon matchar exakt den grå gradienten så videorutan inte blir en
-// synlig "låda", och tonar sedan ner till paper (#F7F5F1) mot nästa sektion.
-// En mild vinjett-mask löser upp ev. kvarvarande nyansskillnad vid kanten.
-// Reduced motion: video visas som standard, stillbild (poster) vid reduce.
+// Dekorativ roterande 3D-logo med ÄKTA transparens: VP9-alpha i WebM, med H.264
+// mp4 som fallback (mp4:n har en jämn grå #e9e9e9 som matchar sektionsbakgrunden).
+// Inga CSS-hack behövs längre (ingen mask, ingen ton-matchning/gradient-lada).
+// Reduced motion: transparent poster-PNG i stället för spelande video.
 const BASE = import.meta.env.BASE_URL;
 ---
 
@@ -18,25 +16,29 @@ const BASE = import.meta.env.BASE_URL;
       playsinline
       webkit-playsinline
       preload="metadata"
-      poster={BASE + 'logo-3d-rotating-poster.jpg'}
+      width="1280"
+      height="720"
+      poster={BASE + 'logo-3d-rotating-poster.png'}
     >
+      <source src={BASE + 'logo-3d-rotating.webm'} type="video/webm" />
       <source src={BASE + 'logo-3d-rotating.mp4'} type="video/mp4" />
     </video>
     <img
       class="brand-video-still"
-      src={BASE + 'logo-3d-rotating-poster.jpg'}
+      src={BASE + 'logo-3d-rotating-poster.png'}
       alt="Bygg & Projektgruppen"
+      width="1280"
+      height="720"
     />
   </div>
 </section>
 
 <style>
   .brand-video {
-    /* Uppmätt grå videoton bakom videon (topp #dcdcdc -> botten #e5e5e5, samma
-       riktning som videons egen gradient) sa videorutan smalter in utan "lada",
-       och tonar sedan #e5e5e5 -> paper (#F7F5F1) mot nasta sektion sa ingen hard
-       kant uppstar. Ovanfor moter mork hero som en ren, avsiktlig kontrast. */
-    background: linear-gradient(to bottom, #dcdcdc 0%, #e5e5e5 62%, #F7F5F1 100%);
+    /* Jamn gra (#e9e9e9 = exakt mp4-fallbackens ton) som tonar till paper (#F7F5F1)
+       nedat. WebM-lasare ser sidbakgrunden rakt igenom loggan (akta alpha); mp4-
+       fallback far en osynlig skarv (jamn gra mot jamn gra). Mork hero ovanfor. */
+    background: linear-gradient(to bottom, #e9e9e9 0%, #e9e9e9 62%, #F7F5F1 100%);
     padding: clamp(3.5rem, 8vw, 7rem) 1.5rem;
     display: flex;
     justify-content: center;
@@ -52,17 +54,12 @@ const BASE = import.meta.env.BASE_URL;
     width: 100%;
     height: auto;
     object-fit: contain;
-    /* Mild vinjett-mask (forsakring): mitten helt opak, ytterkanterna tonar ut till
-       transparent sa ev. kvarvarande nyansskillnad mot den gra ytan loses upp.
-       Konservativ radie (68% opak) sa den roterande loggan aldrig beskars. */
-    -webkit-mask-image: radial-gradient(ellipse 92% 92% at 50% 50%, #000 68%, rgba(0,0,0,0) 100%);
-    mask-image: radial-gradient(ellipse 92% 92% at 50% 50%, #000 68%, rgba(0,0,0,0) 100%);
   }
   /* Som standard: visa videon, dolj stillbilden. */
   .brand-video-still {
     display: none;
   }
-  /* Reducerad rorelse: dolj videon, visa stillbilden. */
+  /* Reducerad rorelse: dolj videon, visa den transparenta stillbilden. */
   @media (prefers-reduced-motion: reduce) {
     .brand-video-media {
       display: none;

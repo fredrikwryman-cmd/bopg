@@ -1,7 +1,9 @@
 ---
-// Dekorativ roterande 3D-logo. Videon har VIT bakgrund. Den ligger på en helvit
-// yta och får en mjuk vinjett-mask så att videorutans (svagt off-white) kanter
-// löses upp mot sektionen i stället för att sluta i en hård fyrkant.
+// Dekorativ roterande 3D-logo. Videon har en svagt GRÅ bakgrund (uppmätt ur
+// postern: topp ~#dcdcdc, botten ~#e5e5e5, lätt vertikal gradient). Sektionen
+// bakom videon matchar exakt den grå gradienten så videorutan inte blir en
+// synlig "låda", och tonar sedan ner till paper (#F7F5F1) mot nästa sektion.
+// En mild vinjett-mask löser upp ev. kvarvarande nyansskillnad vid kanten.
 // Reduced motion: video visas som standard, stillbild (poster) vid reduce.
 const BASE = import.meta.env.BASE_URL;
 ---
@@ -30,10 +32,11 @@ const BASE = import.meta.env.BASE_URL;
 
 <style>
   .brand-video {
-    /* Ren vit bakom videon (matchar videons vita exakt) som mjukt tonar ner till
-       paper-fargen (#F7F5F1) mot nasta sektion, sa det vita bandet inte blir en
-       hard fyrkant mot den off-white sektionen under. */
-    background: linear-gradient(to bottom, #ffffff 0%, #ffffff 82%, #F7F5F1 100%);
+    /* Uppmätt grå videoton bakom videon (topp #dcdcdc -> botten #e5e5e5, samma
+       riktning som videons egen gradient) sa videorutan smalter in utan "lada",
+       och tonar sedan #e5e5e5 -> paper (#F7F5F1) mot nasta sektion sa ingen hard
+       kant uppstar. Ovanfor moter mork hero som en ren, avsiktlig kontrast. */
+    background: linear-gradient(to bottom, #dcdcdc 0%, #e5e5e5 62%, #F7F5F1 100%);
     padding: clamp(3.5rem, 8vw, 7rem) 1.5rem;
     display: flex;
     justify-content: center;
@@ -49,9 +52,9 @@ const BASE = import.meta.env.BASE_URL;
     width: 100%;
     height: auto;
     object-fit: contain;
-    /* Mjuk vinjett-mask: mitten helt opak, ytterkanterna tonar ut till transparent
-       sa videons rektangelkant loses upp mot den vita ytan. Konservativ radie (68%
-       opak) sa den roterande loggan aldrig beskars. */
+    /* Mild vinjett-mask (forsakring): mitten helt opak, ytterkanterna tonar ut till
+       transparent sa ev. kvarvarande nyansskillnad mot den gra ytan loses upp.
+       Konservativ radie (68% opak) sa den roterande loggan aldrig beskars. */
     -webkit-mask-image: radial-gradient(ellipse 92% 92% at 50% 50%, #000 68%, rgba(0,0,0,0) 100%);
     mask-image: radial-gradient(ellipse 92% 92% at 50% 50%, #000 68%, rgba(0,0,0,0) 100%);
   }

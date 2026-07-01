@@ -1,8 +1,8 @@
 ---
-// Dekorativ roterande 3D-logo. Videon har VIT bakgrund, därför ligger den
-// på en egen helvit sektion så att ingen synlig fyrkant uppstår.
-// Reduced motion hanteras helt i CSS (ingen JS): video visas som standard,
-// stillbild (poster) visas i stället vid prefers-reduced-motion: reduce.
+// Dekorativ roterande 3D-logo. Videon har VIT bakgrund. Den ligger på en helvit
+// yta och får en mjuk vinjett-mask så att videorutans (svagt off-white) kanter
+// löses upp mot sektionen i stället för att sluta i en hård fyrkant.
+// Reduced motion: video visas som standard, stillbild (poster) vid reduce.
 const BASE = import.meta.env.BASE_URL;
 ---
 
@@ -30,30 +30,36 @@ const BASE = import.meta.env.BASE_URL;
 
 <style>
   .brand-video {
-    background: #ffffff;
-    padding: clamp(3rem, 6vw, 5rem) 2rem;
+    /* Ren vit bakom videon (matchar videons vita exakt) som mjukt tonar ner till
+       paper-fargen (#F7F5F1) mot nasta sektion, sa det vita bandet inte blir en
+       hard fyrkant mot den off-white sektionen under. */
+    background: linear-gradient(to bottom, #ffffff 0%, #ffffff 82%, #F7F5F1 100%);
+    padding: clamp(3.5rem, 8vw, 7rem) 1.5rem;
     display: flex;
     justify-content: center;
   }
   .brand-video-inner {
     width: 100%;
-    max-width: 520px;
+    max-width: clamp(320px, 78vw, 900px);
     margin: 0 auto;
-    background: #ffffff;
   }
   .brand-video-media,
   .brand-video-still {
     display: block;
     width: 100%;
     height: auto;
-    background: #ffffff;
     object-fit: contain;
+    /* Mjuk vinjett-mask: mitten helt opak, ytterkanterna tonar ut till transparent
+       sa videons rektangelkant loses upp mot den vita ytan. Konservativ radie (68%
+       opak) sa den roterande loggan aldrig beskars. */
+    -webkit-mask-image: radial-gradient(ellipse 92% 92% at 50% 50%, #000 68%, rgba(0,0,0,0) 100%);
+    mask-image: radial-gradient(ellipse 92% 92% at 50% 50%, #000 68%, rgba(0,0,0,0) 100%);
   }
-  /* Som standard: visa videon, dölj stillbilden. */
+  /* Som standard: visa videon, dolj stillbilden. */
   .brand-video-still {
     display: none;
   }
-  /* Reducerad rörelse: dölj videon, visa stillbilden i stället. */
+  /* Reducerad rorelse: dolj videon, visa stillbilden. */
   @media (prefers-reduced-motion: reduce) {
     .brand-video-media {
       display: none;
@@ -64,8 +70,11 @@ const BASE = import.meta.env.BASE_URL;
   }
   @media (max-width: 600px) {
     .brand-video {
-      padding-left: 1.3rem;
-      padding-right: 1.3rem;
+      padding-left: 1.1rem;
+      padding-right: 1.1rem;
+    }
+    .brand-video-inner {
+      max-width: 90vw;
     }
   }
 </style>

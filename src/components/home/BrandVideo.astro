@@ -1,8 +1,10 @@
 ---
-// Dekorativ roterande 3D-logo med ÄKTA transparens: VP9-alpha i WebM, med H.264
-// mp4 som fallback (mp4:n har en jämn grå #e9e9e9 som matchar sektionsbakgrunden).
-// Inga CSS-hack behövs längre (ingen mask, ingen ton-matchning/gradient-lada).
-// Reduced motion: transparent poster-PNG i stället för spelande video.
+// Dekorativ roterande 3D-logo (mp4). INGEN keying: en rejäl mjuk radial vinjett-
+// mask tonar videons kanter till transparent så den (1) döljer AI-vattenstämpeln
+// i nedre högra hörnet och (2) löser upp videorutan så ingen rektangel syns.
+// Sektionsbakgrunden är satt till videons uppmätta bakgrundston (#d4d4d4) så det
+// som skymtar genom fade-zonen smälter ihop, och tonar sedan till paper nedåt.
+// Reduced motion: stillbild (poster) i stället för spelande video.
 const BASE = import.meta.env.BASE_URL;
 ---
 
@@ -18,14 +20,13 @@ const BASE = import.meta.env.BASE_URL;
       preload="metadata"
       width="1280"
       height="720"
-      poster={BASE + 'logo-3d-rotating-poster.png'}
+      poster={BASE + 'logo-3d-rotating-poster.jpg'}
     >
-      <source src={BASE + 'logo-3d-rotating.webm'} type="video/webm" />
       <source src={BASE + 'logo-3d-rotating.mp4'} type="video/mp4" />
     </video>
     <img
       class="brand-video-still"
-      src={BASE + 'logo-3d-rotating-poster.png'}
+      src={BASE + 'logo-3d-rotating-poster.jpg'}
       alt="Bygg & Projektgruppen"
       width="1280"
       height="720"
@@ -35,10 +36,10 @@ const BASE = import.meta.env.BASE_URL;
 
 <style>
   .brand-video {
-    /* Jamn gra (#e9e9e9 = exakt mp4-fallbackens ton) som tonar till paper (#F7F5F1)
-       nedat. WebM-lasare ser sidbakgrunden rakt igenom loggan (akta alpha); mp4-
-       fallback far en osynlig skarv (jamn gra mot jamn gra). Mork hero ovanfor. */
-    background: linear-gradient(to bottom, #e9e9e9 0%, #e9e9e9 62%, #F7F5F1 100%);
+    /* Videons uppmätta bakgrundston (#d4d4d4) bakom videon så fade-zonen smälter
+       ihop, tonande till paper (#F7F5F1) nedåt. Mörk hero ovanför som avsiktlig
+       kontrast. */
+    background: linear-gradient(to bottom, #d4d4d4 0%, #d4d4d4 62%, #F7F5F1 100%);
     padding: clamp(3.5rem, 8vw, 7rem) 1.5rem;
     display: flex;
     justify-content: center;
@@ -54,12 +55,18 @@ const BASE = import.meta.env.BASE_URL;
     width: 100%;
     height: auto;
     object-fit: contain;
+    /* Rejäl mjuk vinjett: helt opak över loggan (centralt), tonar till transparent
+       långt innanför kanterna -> döljer vattenstämpeln (nedre höger) och löser upp
+       rektangeln. Radie verifierad mot flera rotationsframes så loggan aldrig
+       beskärs i någon vinkel. */
+    -webkit-mask-image: radial-gradient(ellipse 47% 60% at 50% 47%, #000 60%, rgba(0, 0, 0, 0) 90%);
+    mask-image: radial-gradient(ellipse 47% 60% at 50% 47%, #000 60%, rgba(0, 0, 0, 0) 90%);
   }
-  /* Som standard: visa videon, dolj stillbilden. */
+  /* Som standard: visa videon, dölj stillbilden. */
   .brand-video-still {
     display: none;
   }
-  /* Reducerad rorelse: dolj videon, visa den transparenta stillbilden. */
+  /* Reducerad rörelse: dölj videon, visa stillbilden. */
   @media (prefers-reduced-motion: reduce) {
     .brand-video-media {
       display: none;

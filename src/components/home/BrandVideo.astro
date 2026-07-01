@@ -1,0 +1,71 @@
+---
+// Dekorativ roterande 3D-logo. Videon har VIT bakgrund, därför ligger den
+// på en egen helvit sektion så att ingen synlig fyrkant uppstår.
+// Reduced motion hanteras helt i CSS (ingen JS): video visas som standard,
+// stillbild (poster) visas i stället vid prefers-reduced-motion: reduce.
+const BASE = import.meta.env.BASE_URL;
+---
+
+<section class="brand-video" aria-hidden="true">
+  <div class="brand-video-inner">
+    <video
+      class="brand-video-media"
+      autoplay
+      muted
+      loop
+      playsinline
+      webkit-playsinline
+      preload="metadata"
+      poster={BASE + 'logo-3d-rotating-poster.jpg'}
+    >
+      <source src={BASE + 'logo-3d-rotating.mp4'} type="video/mp4" />
+    </video>
+    <img
+      class="brand-video-still"
+      src={BASE + 'logo-3d-rotating-poster.jpg'}
+      alt="Bygg & Projektgruppen"
+    />
+  </div>
+</section>
+
+<style>
+  .brand-video {
+    background: #ffffff;
+    padding: clamp(3rem, 6vw, 5rem) 2rem;
+    display: flex;
+    justify-content: center;
+  }
+  .brand-video-inner {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    background: #ffffff;
+  }
+  .brand-video-media,
+  .brand-video-still {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: #ffffff;
+    object-fit: contain;
+  }
+  /* Som standard: visa videon, dölj stillbilden. */
+  .brand-video-still {
+    display: none;
+  }
+  /* Reducerad rörelse: dölj videon, visa stillbilden i stället. */
+  @media (prefers-reduced-motion: reduce) {
+    .brand-video-media {
+      display: none;
+    }
+    .brand-video-still {
+      display: block;
+    }
+  }
+  @media (max-width: 600px) {
+    .brand-video {
+      padding-left: 1.3rem;
+      padding-right: 1.3rem;
+    }
+  }
+</style>

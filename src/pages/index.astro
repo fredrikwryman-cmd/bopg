@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/layout/Navbar.jsx';
 import Footer from '../components/layout/Footer.jsx';
 import HeroSection from '../components/home/HeroSection.jsx';
+import BrandVideo from '../components/home/BrandVideo.astro';
 import ServicesOverview from '../components/home/ServicesOverview.jsx';
 import BeforeAfterSection from '../components/home/BeforeAfterSection.jsx';
 import ProcessSection from '../components/home/ProcessSection.jsx';
@@ -17,6 +18,7 @@ import ContactSection from '../components/contact/ContactSection.jsx';
   <Navbar client:idle />
   <main>
     <HeroSection client:load />
+    <BrandVideo />
     <ServicesOverview client:visible />
     <BeforeAfterSection client:visible />
     <ProcessSection client:visible />

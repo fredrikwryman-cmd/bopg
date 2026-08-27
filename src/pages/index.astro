@@ -14,10 +14,19 @@ import ContactSection from '../components/contact/ContactSection.jsx';
 <Layout
   title="Bygg & Projektgruppen i Stockholm AB | Samlad byggpartner i Åkersberga"
   description="Bygg och Projektgruppen i Stockholm AB — samlad byggpartner i Stockholm med bas i Åkersberga. Nybyggnation, renovering, entreprenad, el & VVS, mark, plåt och smide."
+  preloadImage="hero.jpg"
+  preloadImageSrcset="/hero-800.jpg 800w, /hero.jpg 1400w"
+  preloadImageSizes="100vw"
 >
   <Navbar client:idle />
   <main>
-    <HeroSection client:load />
+    {/* client:idle, inte client:load — samma som systersajtens hero. Hero-bilden
+        är sidans LCP-element och ligger redan färdig i serverrenderad HTML, men
+        client:load lade hydreringen av React + framer-motion (ca 300 kB) före
+        första målningen. Med 4x CPU-strypning band det huvudtråden i drygt fem
+        sekunder innan bilden hann målas — LCP-mätningen visade 91 % "render
+        delay". client:idle låter webbläsaren måla först och hydrera sedan. */}
+    <HeroSection client:idle />
     <BrandVideo />
     <ServicesOverview client:visible />
     <BeforeAfterSection client:visible />

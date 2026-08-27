@@ -1,8 +1,36 @@
 ---
+// Typsnitten levereras från sajten själv i stället för via en render-blockerande
+// @import från fonts.googleapis.com i global.css. Den kedjan kostade ~780 ms på
+// första målningen: webbläsaren tvingades hämta en extern stilmall innan den ens
+// visste vilka typsnittsfiler den behövde. font-display: swap ingår i filerna.
+// Endast latin-subsetet importeras — svenska å/ä/ö ryms där.
+import '@fontsource/archivo/latin-500.css';
+import '@fontsource/archivo/latin-600.css';
+import '@fontsource/archivo/latin-700.css';
+import '@fontsource/archivo/latin-800.css';
+import '@fontsource/archivo/latin-900.css';
+import '@fontsource/manrope/latin-400.css';
+import '@fontsource/manrope/latin-500.css';
+import '@fontsource/manrope/latin-600.css';
+import '@fontsource/manrope/latin-700.css';
+import '@fontsource/space-mono/latin-400.css';
+import '@fontsource/space-mono/latin-700.css';
+
 const {
   title = 'Bygg & Projektgruppen i Stockholm AB',
   description = 'Bygg och Projektgruppen i Stockholm AB — samlad byggpartner i Stockholm med bas i Åkersberga. Nybyggnation, renovering, entreprenad, el & VVS, mark, plåt och smide.',
+  // Filnamn i public/ för sidans LCP-bild. Sätts bara av sidor som har en stor
+  // bild direkt i första vyn (i dag startsidans hero) så att webbläsaren kan
+  // börja hämta den direkt ur HTML:en, i stället för att först vänta in React-öns
+  // hydrering. Sidor utan prop får ingen preload — en oanvänd preload kostar bara
+  // bandbredd. srcset/sizes speglar <img>-taggens egna värden så att preloaden
+  // väljer exakt samma kandidat som bilden själv gör.
+  preloadImage,
+  preloadImageSrcset,
+  preloadImageSizes,
 } = Astro.props;
+
+const preloadImageURL = preloadImage ? `${import.meta.env.BASE_URL}${preloadImage}` : null;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const siteRoot = new URL(import.meta.env.BASE_URL, Astro.site).href;
@@ -44,6 +72,17 @@ const jsonLd = {
          eller ranka före Bygg & Projektgruppens framtida riktiga webbplats.
          "follow" behålls så att utgående länkar fortfarande följs normalt. -->
     <meta name="robots" content="noindex, follow" />
+
+    {preloadImageURL && (
+      <link
+        rel="preload"
+        as="image"
+        href={preloadImageURL}
+        imagesrcset={preloadImageSrcset}
+        imagesizes={preloadImageSizes}
+        fetchpriority="high"
+      />
+    )}
 
     <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
 

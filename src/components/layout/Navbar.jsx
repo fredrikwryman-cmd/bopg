@@ -41,7 +41,12 @@ export default function Navbar() {
     <>
       <nav className={`nav${scrolled ? ' nav--scrolled' : ''}${hidden ? ' nav--hidden' : ''}`} aria-label="Huvudmeny">
         <div className="nav-in">
-          <a className="brand" href={BASE} aria-label="Bygg & Projektgruppen — till startsidan">
+          {/* Ingen aria-label här: den lydde "Bygg & Projektgruppen — till startsidan"
+              och innehöll därmed inte länkens synliga text ("... SAMLAD BYGGEXPERTIS
+              · STOCKHOLM"). Skärmläsarnamnet sa alltså något annat än det som stod
+              på skärmen, vilket bryter WCAG 2.5.3 Label in Name. Utan aria-label blir
+              namnet den synliga texten och de två kan inte glida isär. */}
+          <a className="brand" href={BASE}>
             <Logo />
           </a>
           <div className="nav-links">

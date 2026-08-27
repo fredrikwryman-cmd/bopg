@@ -78,8 +78,8 @@ export default function BeforeAfterSection() {
                 ref={stageRef}
                 onPointerDown={(e) => { dragging.current = true; fromEvent(e); }}
               >
-                <img className="ba-after" src={BASE + current.after} alt={`Efter renovering — ${current.label}`} />
-                <img className="ba-before" src={BASE + current.before} alt={`Före renovering — ${current.label}`} style={{ clipPath: `inset(0 ${100 - x}% 0 0)` }} />
+                <img className="ba-after" src={BASE + current.after} alt={`Efter renovering — ${current.label}`} loading="lazy" decoding="async" />
+                <img className="ba-before" src={BASE + current.before} alt={`Före renovering — ${current.label}`} loading="lazy" decoding="async" style={{ clipPath: `inset(0 ${100 - x}% 0 0)` }} />
                 <span className="ba-label ba-label-before">Före</span>
                 <span className="ba-label ba-label-after">Efter</span>
                 <div className="ba-divider" style={{ left: x + '%' }}>

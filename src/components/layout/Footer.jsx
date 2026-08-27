@@ -18,7 +18,7 @@ export default function Footer() {
           </p>
         </div>
         <div>
-          <h4>Tjänster</h4>
+          <h2>Tjänster</h2>
           <ul>
             {services.slice(0, 4).map((s) => (
               <li key={s.slug}>
@@ -29,7 +29,7 @@ export default function Footer() {
           </ul>
         </div>
         <div>
-          <h4>Kontakt</h4>
+          <h2>Kontakt</h2>
           <ul>
             <li><a href={company.phoneHref}>{company.phone}</a></li>
             <li><a href={company.emailHref}>{company.email}</a></li>

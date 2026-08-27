@@ -1,5 +1,7 @@
-/* ===== FONTS ===== */
-@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Manrope:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+/* ===== FONTS =====
+   Archivo, Manrope och Space Mono self-hostas via @fontsource och importeras i
+   src/layouts/Layout.astro. Tidigare låg en @import mot fonts.googleapis.com här,
+   vilket blockerade första målningen (~780 ms) och krävde en extra anslutning. */
 
 @import "tailwindcss";
 
@@ -9,7 +11,7 @@
   --color-paper-2: #EFEBE3;
   --color-ink: #222A33;
   --color-slate: #3A4756;
-  --color-muted: #6B7480;
+  --color-muted: #5F6875;
   --color-blue: #1F4E96;
   --color-blue-deep: #163A72;
   --color-blue-lt: #6098D6;
@@ -23,7 +25,7 @@
   --paper-2: #EFEBE3;
   --ink: #222A33;
   --slate: #3A4756;
-  --muted: #6B7480;
+  --muted: #5F6875;
   --blue: #1F4E96;
   --blue-deep: #163A72;
   --blue-lt: #6098D6;
@@ -217,7 +219,7 @@ h1, h2, h3 { font-family: 'Archivo', sans-serif; line-height: 1; }
 .foot .fb b .amp { color: var(--gold-lt); }
 .foot .fb .tag { font-family: 'Space Mono', monospace; font-size: .72rem; letter-spacing: .18em; color: rgba(247,245,241,.55); margin-top: .6rem; text-transform: uppercase; }
 .foot .fb p { margin-top: 1.1rem; color: rgba(247,245,241,.7); font-size: .94rem; line-height: 1.7; max-width: 24rem; }
-.foot h4 { font-family: 'Space Mono', monospace; font-size: .74rem; letter-spacing: .2em; text-transform: uppercase; color: var(--gold-lt); margin-bottom: 1rem; }
+.foot h2 { font-family: 'Space Mono', monospace; font-size: .74rem; letter-spacing: .2em; text-transform: uppercase; color: var(--gold-lt); margin-bottom: 1rem; }
 .foot ul { list-style: none; display: flex; flex-direction: column; gap: .6rem; }
 .foot ul a, .foot ul li { color: rgba(247,245,241,.78); font-size: .95rem; transition: color .2s; }
 .foot ul a:hover { color: #fff; }
@@ -249,7 +251,7 @@ h1, h2, h3 { font-family: 'Archivo', sans-serif; line-height: 1; }
 .sd-inc li { position: relative; padding-left: 1.6rem; color: var(--ink); font-size: 1rem; line-height: 1.55; }
 .sd-inc li::before { content: ''; position: absolute; left: 0; top: .5em; width: 9px; height: 9px; background: var(--gold); border-radius: 1px; }
 .sd-aside { border: 1.5px solid var(--ink); border-radius: 4px; background: #fff; padding: 1.8rem; position: sticky; top: 6rem; }
-.sd-aside h3 { font-size: 1.2rem; font-weight: 800; text-transform: uppercase; color: var(--ink); margin-bottom: .6rem; }
+.sd-aside h2 { font-size: 1.2rem; font-weight: 800; text-transform: uppercase; color: var(--ink); margin-bottom: .6rem; }
 .sd-aside p { font-size: .96rem; line-height: 1.6; color: var(--slate); margin-bottom: 1.3rem; }
 .sd-other { margin-top: 3.5rem; }
 .sd-other-h { font-family: 'Space Mono', monospace; font-size: .76rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.2rem; }
@@ -276,7 +278,7 @@ h1, h2, h3 { font-family: 'Archivo', sans-serif; line-height: 1; }
 .ba-divider { position: absolute; top: 0; bottom: 0; left: 50%; width: 3px; background: #fff; z-index: 3; transform: translateX(-50%); box-shadow: 0 0 14px rgba(0,0,0,.45); }
 .ba-handle { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 48px; height: 48px; border-radius: 50%; background: #fff; color: var(--ink); display: flex; align-items: center; justify-content: center; font-size: 1.15rem; cursor: ew-resize; box-shadow: 0 4px 16px rgba(0,0,0,.38); border: 2px solid var(--gold); }
 .ba-handle:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
-.ba-hint { margin-top: 1rem; font-family: 'Space Mono', monospace; font-size: .72rem; letter-spacing: .1em; color: var(--slate); opacity: .75; display: flex; align-items: center; gap: .5rem; }
+.ba-hint { margin-top: 1rem; font-family: 'Space Mono', monospace; font-size: .72rem; letter-spacing: .1em; color: var(--slate); opacity: .85; display: flex; align-items: center; gap: .5rem; }
 .ba-info { display: flex; flex-direction: column; align-items: flex-start; height: 100%; }
 .ba-info-ey { font-family: 'Space Mono', monospace; font-size: .72rem; letter-spacing: .22em; text-transform: uppercase; color: var(--blue); display: inline-flex; align-items: center; gap: .6rem; margin-bottom: .9rem; }
 .ba-info-ey::before { content: ''; width: 24px; height: 2px; background: var(--gold); }

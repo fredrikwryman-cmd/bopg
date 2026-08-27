@@ -5,6 +5,16 @@
 // Sektionsbakgrunden är satt till videons uppmätta bakgrundston (#d4d4d4) så det
 // som skymtar genom fade-zonen smälter ihop, och tonar sedan till paper nedåt.
 // Reduced motion: stillbild (poster) i stället för spelande video.
+//
+// LADDNINGSSTRATEGI (mp4:an är 2,1 MB — startsidans i särklass tyngsta resurs):
+// Videon har varken autoplay eller <source> i markupen. src sätts av scriptet
+// nedan, och bara när BÅDA villkoren är uppfyllda:
+//   1. viewporten är minst 768 px bred — på mobil visas enbart stillbilden och
+//      mp4:an hämtas aldrig, och
+//   2. sektionen är nära viewporten (IntersectionObserver).
+// preload="metadata" räckte inte: attributet autoplay får webbläsaren att hämta
+// hela filen ändå. På 1,6 Mbps tog de 2,1 MB ensamma ~10 s och svälte hero-bilden
+// – sidans LCP-element – på bandbredd.
 const BASE = import.meta.env.BASE_URL;
 ---
 
@@ -12,27 +22,86 @@ const BASE = import.meta.env.BASE_URL;
   <div class="brand-video-inner">
     <video
       class="brand-video-media"
-      autoplay
       muted
       loop
       playsinline
       webkit-playsinline
-      preload="metadata"
+      preload="none"
       width="1280"
       height="720"
+      data-src={BASE + 'logo-3d-rotating.mp4'}
       poster={BASE + 'logo-3d-rotating-poster.jpg'}
-    >
-      <source src={BASE + 'logo-3d-rotating.mp4'} type="video/mp4" />
-    </video>
+    ></video>
     <img
       class="brand-video-still"
       src={BASE + 'logo-3d-rotating-poster.jpg'}
       alt="Bygg & Projektgruppen"
       width="1280"
       height="720"
+      loading="lazy"
+      decoding="async"
     />
   </div>
 </section>
+
+<script>
+  // Samma mönster som systersajtens StopMotionBanner: uppspelningen startas av
+  // scriptet i stället för av attributet autoplay, och filen hämtas först när
+  // sektionen närmar sig viewporten. Tillägget här är mobilgrinden — under 768 px
+  // får videon aldrig någon src alls, så mp4:an laddas inte ned över huvud taget.
+  const DESKTOP = '(min-width: 768px)';
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const desktop = window.matchMedia(DESKTOP);
+
+  const videos = Array.prototype.slice.call(document.querySelectorAll('.brand-video-media'));
+
+  // Sätter src (= startar nedladdningen) och spelar upp. Anropas bara när både
+  // mobilgrinden och viewport-grinden släppt igenom.
+  const start = (v) => {
+    if (v.dataset.started === 'true') return;
+    if (!desktop.matches) return;
+    if (v.dataset.nearViewport !== 'true') return;
+    v.dataset.started = 'true';
+    // iOS/Android kräver muted + playsinline för uppspelning utan användargest.
+    v.muted = true;
+    v.defaultMuted = true;
+    v.setAttribute('muted', '');
+    v.src = v.dataset.src;
+    v.load();
+    const p = v.play();
+    if (p && p.catch) p.catch(() => {});
+  };
+
+  videos.forEach((v) => {
+    // Vid minskad rörelse visas stillbilden (se CSS) och videon rörs aldrig.
+    if (reduced) return;
+
+    if ('IntersectionObserver' in window) {
+      // rootMargin ger klippet 300 px försprång så det hunnit börja spela när
+      // sektionen rullas in. Observern kopplas bort efter första träffen.
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          v.dataset.nearViewport = 'true';
+          start(v);
+          io.disconnect();
+        });
+      }, { rootMargin: '300px 0px', threshold: 0 });
+      io.observe(v);
+    } else {
+      // Utan IntersectionObserver faller vi tillbaka på att starta direkt —
+      // mobilgrinden i start() gäller fortfarande.
+      v.dataset.nearViewport = 'true';
+      start(v);
+    }
+
+    // Växer fönstret förbi 768 px (rotation eller storleksändring) efter att
+    // sektionen varit i vy, hämtas videon då i stället.
+    const onChange = () => { if (desktop.matches) start(v); };
+    if (desktop.addEventListener) desktop.addEventListener('change', onChange);
+    else desktop.addListener(onChange);
+  });
+</script>
 
 <style>
   .brand-video {
@@ -68,6 +137,16 @@ const BASE = import.meta.env.BASE_URL;
   }
   /* Reducerad rörelse: dölj videon, visa stillbilden. */
   @media (prefers-reduced-motion: reduce) {
+    .brand-video-media {
+      display: none;
+    }
+    .brand-video-still {
+      display: block;
+    }
+  }
+  /* Mobil (< 768 px): stillbilden i stället för videon. Speglar mobilgrinden i
+     scriptet ovan, som ser till att mp4:an aldrig ens hämtas på små skärmar. */
+  @media (max-width: 767px) {
     .brand-video-media {
       display: none;
     }

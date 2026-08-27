@@ -26,7 +26,7 @@ export default function ServiceDetail({ slug }) {
           </motion.div>
 
           <motion.aside className="sd-aside" initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}>
-            <h3>Begär offert</h3>
+            <h2>Begär offert</h2>
             <p>
               Berätta om ditt projekt inom {service.title.toLowerCase()} så återkommer vi
               med en tydlig offert så snart vi kan. Fast pris i första hand.

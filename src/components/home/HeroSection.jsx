@@ -14,12 +14,22 @@ export default function HeroSection() {
 
   return (
     <header className="hero" id="top" ref={ref}>
+      {/* Sidans LCP-element. fetchPriority="high" flyttar upp bilden i webbläsarens
+          köordning (Lighthouse-revisionen "LCP request discovery" saknade just den),
+          och srcSet låter mobilen nöja sig med 800 px-varianten (47 kB) i stället för
+          1400 px (118 kB). Attributen ligger på motion.img — framer-motion skickar
+          okända props vidare till <img> orört, så parallaxen (y/scale) rörs inte.
+          Motsvarande <link rel="preload"> sätts i Layout.astro via index.astro. */}
       <motion.img
         className="hero-bg"
         src={BASE + 'hero.jpg'}
+        srcSet={`${BASE}hero-800.jpg 800w, ${BASE}hero.jpg 1400w`}
+        sizes="100vw"
         alt="Byggteam som planerar över ritningar"
         style={{ y: bgY, scale: bgScale }}
         loading="eager"
+        fetchPriority="high"
+        decoding="async"
       />
       <div className="hero-scrim" />
       <div className="hero-grid" />

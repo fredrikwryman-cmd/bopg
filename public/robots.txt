@@ -1,2 +1,4 @@
 User-agent: *
 Disallow: /
+
+Sitemap: https://bopg.aimstudios.se/sitemap.xml

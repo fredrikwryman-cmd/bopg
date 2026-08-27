@@ -1,5 +1,9 @@
 # Bygg & Projektgruppen (BOPG) — webbplats
 
+> **VID KUNDLANSERING:** sätt noindex på denna demosajt så den inte konkurrerar
+> med kundens riktiga sajt i Google. Ändra `robots`-propens defaultvärde i
+> `src/layouts/Layout.astro` till `'noindex, follow'`.
+
 Astro v6 + React + Tailwind v4 + Framer Motion. Ombyggd från en enfils-HTML till en
 riktig flersidig Astro-sajt. Speglar arkitektur och kvalitet från systerprojektet
 AD Byggprojekt, men med BOPG:s egen "blueprint"-palett (paper/ink/blue/gold) och

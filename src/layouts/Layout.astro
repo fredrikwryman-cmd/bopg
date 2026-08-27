@@ -28,6 +28,9 @@ const {
   preloadImage,
   preloadImageSrcset,
   preloadImageSizes,
+  // Sidorna indexeras. Enbart 404-sidan skickar noindex – en felsida hör inte
+  // hemma i sökresultaten. Se påminnelsen i <head> nedan inför kundlansering.
+  robots = 'index, follow',
 } = Astro.props;
 
 const preloadImageURL = preloadImage ? `${import.meta.env.BASE_URL}${preloadImage}` : null;
@@ -71,7 +74,10 @@ const jsonLd = {
          Därför noindex på ALLA sidor — arbetsprovet får aldrig konkurrera med
          eller ranka före Bygg & Projektgruppens framtida riktiga webbplats.
          "follow" behålls så att utgående länkar fortfarande följs normalt. -->
-    <meta name="robots" content="noindex, follow" />
+    <!-- VID KUNDLANSERING: sätt noindex på denna demosajt så den inte konkurrerar
+         med kundens riktiga sajt i Google. Ändra defaultvärdet för robots-propen
+         ovan till 'noindex, follow'. -->
+    <meta name="robots" content={robots} />
 
     {preloadImageURL && (
       <link

@@ -28,9 +28,11 @@ const {
   preloadImage,
   preloadImageSrcset,
   preloadImageSizes,
-  // Sidorna indexeras. Enbart 404-sidan skickar noindex – en felsida hör inte
-  // hemma i sökresultaten. Se påminnelsen i <head> nedan inför kundlansering.
-  robots = 'index, follow',
+  // Arbetsprov på subdomän till aimstudios.se – får INTE indexeras. När kunden
+  // lanserar på sin egen domän ska den sajten äga sin egen text i Google, inte
+  // konkurrera med en kopia här. Sätt tillbaka 'index, follow' först om sajten
+  // någon gång ska bo kvar på den här adressen på riktigt.
+  robots = 'noindex, nofollow',
 } = Astro.props;
 
 const preloadImageURL = preloadImage ? `${import.meta.env.BASE_URL}${preloadImage}` : null;
@@ -70,13 +72,9 @@ const jsonLd = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#222A33" />
-    <!-- Sajten är ett arbetsprov i Fredriks portfölj, inte kundens skarpa sajt.
-         Därför noindex på ALLA sidor — arbetsprovet får aldrig konkurrera med
-         eller ranka före Bygg & Projektgruppens framtida riktiga webbplats.
-         "follow" behålls så att utgående länkar fortfarande följs normalt. -->
-    <!-- VID KUNDLANSERING: sätt noindex på denna demosajt så den inte konkurrerar
-         med kundens riktiga sajt i Google. Ändra defaultvärdet för robots-propen
-         ovan till 'noindex, follow'. -->
+    <!-- Noindex på ALLA sidor. Sajten crawlas fortfarande (robots.txt spärrar inte)
+         så att Google faktiskt hinner läsa den här taggen – en spärrad adress kan
+         annars hamna i indexet ändå, via en extern länk, som en tom träff. -->
     <meta name="robots" content={robots} />
 
     {preloadImageURL && (

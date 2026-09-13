@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 
 const steps = [
   { n: '01', title: 'Planering', text: 'Vi får bäst resultat när beställningen kommer i god tid. Vi planerar noggrant så att rätt sak görs i rätt ordning.' },
-  { n: '02', title: 'Fast pris i första hand', text: 'Vi eftersträvar fasta priser och tydliga offerter, men arbetar även på löpande räkning vid behov. Prislista finns på begäran.' },
+  { n: '02', title: 'Fast pris i första hand', text: 'Vi eftersträvar fasta priser och tydliga offerter, så att du vet vad projektet kostar innan det börjar.' },
   { n: '03', title: 'Kvalitet & miljö', text: 'Efter utfört arbete levererar vi alltid relevant kvalitets- och miljödokumentation — inget lämnas åt slumpen.' },
   { n: '04', title: 'En kontakt', text: 'Brett kunnande samlat på ett ställe. Du har en kontakt genom hela projektet, från första ritning till färdigt.' },
 ];

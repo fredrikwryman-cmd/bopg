@@ -125,7 +125,7 @@ export default function ContactSection({ subject = 'Ny förfrågan från byggopr
             <iframe
               loading="lazy"
               title="Karta Åkersberga"
-              src="https://www.openstreetmap.org/export/embed.html?bbox=18.2820%2C59.4730%2C18.3175%2C59.4865&layer=mapnik&marker=59.4794%2C18.2997"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=18.270623%2C59.472941%2C18.306123%2C59.486441&layer=mapnik&marker=59.479691%2C18.288373"
             />
           </div>
         </div>

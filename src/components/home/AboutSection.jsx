@@ -14,7 +14,7 @@ export default function AboutSection({ withLink = true }) {
         <motion.div className="about" initial={{ opacity: 0, y: 26 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-40px' }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}>
           <div>
             <p>
-              Bygg och Projektgruppen är en <strong>samlad byggpartner i Stockholmsområdet</strong>,
+              {company.name} är en <strong>samlad byggpartner i Stockholmsområdet</strong>,
               med bas i Åkersberga. Vi tar oss an allt från nybyggnation och totalrenovering
               till installation, mark, plåt och fastighet — med samma mål oavsett storlek:
               kvalitet, ordning och en rak, ärlig dialog.

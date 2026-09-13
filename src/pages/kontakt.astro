@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { company } from '../data/company.js';
 import Navbar from '../components/layout/Navbar.jsx';
 import Footer from '../components/layout/Footer.jsx';
 import PageHeader from '../components/pages/PageHeader.jsx';
@@ -7,8 +8,8 @@ import ContactSection from '../components/contact/ContactSection.jsx';
 ---
 
 <Layout
-  title="Kontakt | Bygg & Projektgruppen i Stockholm AB"
-  description="Kontakta Bygg & Projektgruppen i Åkersberga. Berätta om ditt projekt så återkommer vi med en offert så snart vi kan."
+  title={`Kontakt | ${company.legalName}`}
+  description={`Kontakta ${company.name} i Åkersberga. Berätta om ditt projekt så återkommer vi med en offert så snart vi kan.`}
 >
   <Navbar client:idle />
   <main>

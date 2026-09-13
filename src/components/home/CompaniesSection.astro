@@ -17,6 +17,7 @@
 // Scriptet ligger som inline-modul i samma fil och körs under parsningen, före
 // första målningen, så ingen blixt av synliga kort hinner visas.
 
+import { company } from '../../data/company.js';
 const companies = [
   {
     name: 'AD Byggprojekt',
@@ -58,7 +59,7 @@ const companies = [
     <span class="sec-ey">Gruppen</span>
     <h2 class="sec-h">Våra bolag</h2>
     <p class="sec-intro">
-      Bygg &amp; Projektgruppen är navet i en grupp bolag som tillsammans täcker
+      {company.name} är navet i en grupp bolag som tillsammans täcker
       hela kedjan — från byggherrens första idé till färdig överlämning.
     </p>
 

@@ -7,8 +7,8 @@ import { company } from '../data/company.js';
 ---
 
 <Layout
-  title="Integritetspolicy | Bygg & Projektgruppen i Stockholm AB"
-  description="Så behandlar Bygg och Projektgruppen i Stockholm AB personuppgifter som lämnas via webbplatsens kontaktformulär."
+  title={`Integritetspolicy | ${company.legalName}`}
+  description={`Så behandlar ${company.legalName} personuppgifter som lämnas via webbplatsens kontaktformulär.`}
 >
   <Navbar client:idle />
   <main>

@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { company } from '../data/company.js';
 import Navbar from '../components/layout/Navbar.jsx';
 import Footer from '../components/layout/Footer.jsx';
 import HeroSection from '../components/home/HeroSection.jsx';
@@ -11,8 +12,8 @@ import ContactSection from '../components/contact/ContactSection.jsx';
 ---
 
 <Layout
-  title="Bygg & Projektgruppen i Stockholm AB | Samlad byggpartner i Åkersberga"
-  description="Bygg och Projektgruppen i Stockholm AB — samlad byggpartner i Stockholm med bas i Åkersberga. Nybyggnation, renovering, entreprenad, el & VVS, mark, plåt och smide."
+  title={`${company.legalName} | Samlad byggpartner i Åkersberga`}
+  description={`${company.legalName} — samlad byggpartner i Stockholm med bas i Åkersberga. Nybyggnation, renovering, entreprenad, el & VVS, mark, plåt och smide.`}
   preloadImage="hero.jpg"
   preloadImageSrcset="/hero-800.jpg 800w, /hero.jpg 1400w"
   preloadImageSizes="100vw"

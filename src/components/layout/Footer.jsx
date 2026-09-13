@@ -6,7 +6,9 @@ export default function Footer() {
     <footer className="foot">
       <div className="foot-grid wrap">
         <div className="fb">
-          <b>BYGG <span className="amp">&amp;</span> PROJEKTGRUPPEN</b>
+          <b>
+            {company.wordmark[0]} <span className="amp">&amp;</span> {company.wordmark[1]}
+          </b>
           <div className="tag">Bygg · Projektledning · Entreprenad</div>
           <p>
             Samlad byggpartner i Stockholmsområdet med bas i Åkersberga. Nybyggnation,
@@ -25,7 +27,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="foot-bot">
-        <span>© {year} BYGG OCH PROJEKT GRUPPEN I STOCKHOLM AB</span>
+        <span>© {year} {company.legalName}</span>
         <span>
           <a href="/integritetspolicy">Integritetspolicy</a>
           {' · '}ORG.NR {company.orgNr} · ÅKERSBERGA

@@ -15,6 +15,7 @@
 // preload="metadata" räckte inte: attributet autoplay får webbläsaren att hämta
 // hela filen ändå. På 1,6 Mbps tog de 2,1 MB ensamma ~10 s och svälte hero-bilden
 // – sidans LCP-element – på bandbredd.
+import { company } from '../../data/company.js';
 const BASE = import.meta.env.BASE_URL;
 ---
 
@@ -35,7 +36,7 @@ const BASE = import.meta.env.BASE_URL;
     <img
       class="brand-video-still"
       src={BASE + 'logo-3d-rotating-poster.jpg'}
-      alt="Bygg & Projektgruppen"
+      alt={company.name}
       width="1280"
       height="720"
       loading="lazy"

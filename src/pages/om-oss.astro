@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { company } from '../data/company.js';
 import Navbar from '../components/layout/Navbar.jsx';
 import Footer from '../components/layout/Footer.jsx';
 import PageHeader from '../components/pages/PageHeader.jsx';
@@ -9,8 +10,8 @@ import ContactSection from '../components/contact/ContactSection.jsx';
 ---
 
 <Layout
-  title="Om oss | Bygg & Projektgruppen i Stockholm AB"
-  description="Bygg och Projektgruppen är en samlad byggpartner i Stockholmsområdet med bas i Åkersberga. Bakom gruppen står Andreas Dahlgren med över 20 års erfarenhet."
+  title={`Om oss | ${company.legalName}`}
+  description={`${company.name} är en samlad byggpartner i Stockholmsområdet med bas i Åkersberga. Bakom gruppen står Andreas Dahlgren med över 20 års erfarenhet.`}
 >
   <Navbar client:idle />
   <main>

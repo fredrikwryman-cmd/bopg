@@ -29,7 +29,7 @@ export default function ContactSection({ subject = 'Ny förfrågan från byggopr
         body: JSON.stringify({
           access_key: WEB3FORMS_KEY,
           subject,
-          from_name: 'Bygg & Projektgruppen webbplats',
+          from_name: `${company.legalName} webbplats`,
           name: form.name,
           email: form.email,
           phone: form.phone,

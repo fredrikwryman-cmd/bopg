@@ -16,9 +16,11 @@ import '@fontsource/manrope/latin-700.css';
 import '@fontsource/space-mono/latin-400.css';
 import '@fontsource/space-mono/latin-700.css';
 
+import { company } from '../data/company.js';
+
 const {
-  title = 'Bygg & Projektgruppen i Stockholm AB',
-  description = 'Bygg och Projektgruppen i Stockholm AB — samlad byggpartner i Stockholm med bas i Åkersberga. Nybyggnation, renovering, entreprenad, el & VVS, mark, plåt och smide.',
+  title = company.legalName,
+  description = `${company.legalName} — samlad byggpartner i Stockholm med bas i Åkersberga. Nybyggnation, renovering, entreprenad, el & VVS, mark, plåt och smide.`,
   // Filnamn i public/ för sidans LCP-bild. Sätts bara av sidor som har en stor
   // bild direkt i första vyn (i dag startsidans hero) så att webbläsaren kan
   // börja hämta den direkt ur HTML:en, i stället för att först vänta in React-öns
@@ -44,11 +46,12 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'GeneralContractor',
   '@id': siteRoot,
-  name: 'Bygg och Projekt Gruppen i Stockholm AB',
-  alternateName: 'Bygg & Projektgruppen',
+  name: company.legalName,
+  legalName: company.legalName,
+  alternateName: company.name,
   url: siteRoot,
-  telephone: '+46704629943',
-  email: 'Andreas@byggoprojektgruppen.se',
+  telephone: company.phoneHref.replace('tel:', ''),
+  email: company.email,
   address: {
     '@type': 'PostalAddress',
     streetAddress: 'Sågvägen 33',
@@ -61,8 +64,8 @@ const jsonLd = {
     { '@type': 'City', name: 'Stockholm' },
     { '@type': 'City', name: 'Åkersberga' },
   ],
-  identifier: { '@type': 'PropertyValue', name: 'Organisationsnummer', value: '559576-5198' },
-  founder: { '@type': 'Person', name: 'Andreas Berndt Dahlgren' },
+  identifier: { '@type': 'PropertyValue', name: 'Organisationsnummer', value: company.orgNr },
+  founder: { '@type': 'Person', name: company.ceo },
 };
 ---
 <!DOCTYPE html>
@@ -96,7 +99,7 @@ const jsonLd = {
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Bygg & Projektgruppen" />
+    <meta property="og:site_name" content={company.legalName} />
     <meta property="og:locale" content="sv_SE" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />

@@ -58,7 +58,7 @@ export default function HeroSection() {
             </motion.span>
           </h1>
           <motion.p className="sub" initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.4 }}>
-            BOPG driver ditt byggprojekt som Construction Management-partner — rådgivare,
+            Vi driver ditt byggprojekt som Construction Management-partner — rådgivare,
             samordnare och projektledare genom hela kedjan. Du tecknar avtalen direkt med
             entreprenörerna, vi håller i helheten.
           </motion.p>

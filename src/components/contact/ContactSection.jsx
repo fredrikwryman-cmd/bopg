@@ -56,11 +56,8 @@ export default function ContactSection({ subject = 'Ny förfrågan från byggopr
         {showHeading && (
           <motion.div initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}>
             <span className="sec-ey">Kontakt</span>
-            <h2 className="sec-h">Hör av dig</h2>
-            <p className="sec-intro">
-              Berätta om ditt projekt så återkommer vi så snart vi kan. Vill du ha vår
-              prislista för löpande arbeten? Säg till.
-            </p>
+            <h2 className="sec-h">Kontakta oss</h2>
+            <p className="sec-intro">Berätta om ditt projekt så återkommer vi inom kort.</p>
           </motion.div>
         )}
 

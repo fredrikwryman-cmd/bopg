@@ -15,12 +15,12 @@ import ContactSection from '../components/contact/ContactSection.jsx';
     <PageHeader
       client:load
       eyebrow="Kontakt"
-      title="Hör av dig"
-      subtitle="Berätta om ditt projekt så återkommer vi så snart vi kan. Vill du ha vår prislista för löpande arbeten? Säg till."
+      title="Kontakta oss"
+      subtitle="Berätta om ditt projekt så återkommer vi inom kort."
       crumbs={[{ label: 'Kontakt' }]}
     />
     {/* showHeading={false}: PageHeader ovanför visar redan eyebrow "Kontakt",
-        rubriken "Hör av dig" och samma ingress. Utan flaggan renderades hela
+        rubriken och samma ingress. Utan flaggan renderades hela
         blocket två gånger i rad — först mörkt, sedan ljust. */}
     <ContactSection client:visible showHeading={false} subject="Ny förfrågan från byggoprojektgruppen.se (Kontakt)" />
   </main>

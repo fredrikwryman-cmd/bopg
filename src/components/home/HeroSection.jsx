@@ -6,12 +6,12 @@ const BASE = import.meta.env.BASE_URL;
 // Banderollen listar gruppens bolag sedan BOPG lades om mot CM-uppdrag.
 // Tidigare låg sju enskilda hantverkstjänster här, vilket sa utförande
 // entreprenör — tvärtemot CM-rollen.
-const ticker = [
-  'AD Byggprojekt — Entreprenad & totalentreprenad',
-  'Bolag 02 — CM-uppdrag, namn inom kort',
-  'Bolag 03 — CM-uppdrag, namn inom kort',
-  'Bolag 04 — CM-uppdrag, namn inom kort',
-];
+// Korta poster med flit. .mq-item sätter text-transform: uppercase och
+// letter-spacing .16em, så beskrivande meningar blir väldigt breda och bara
+// drygt en post ryms på skärmen åt gången. Beskrivningarna bor i stället i
+// sektionen Våra bolag. Spårets bredd styr banderollens hastighet — se
+// kommentaren vid .mq-track i global.css.
+const ticker = ['AD Byggprojekt', 'Bolag 02 (snart)', 'Bolag 03 (snart)', 'Bolag 04 (snart)'];
 
 export default function HeroSection() {
   const ref = useRef(null);
@@ -48,20 +48,19 @@ export default function HeroSection() {
           </motion.span>
           <h1 className="headline">
             <motion.span style={{ display: 'block' }} initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.18 }}>
-              Bygg, projekt
+              Samlad byggpartner.
             </motion.span>
             <motion.span className="accent" style={{ display: 'block' }} initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.32 }}>
-              <span className="amp-g">&amp;</span> entreprenad.
+              Från projektledning till färdig byggnad.
               <svg className="sweep" viewBox="0 0 600 60" preserveAspectRatio="none" aria-hidden="true">
                 <path d="M8,42 C150,12 430,8 592,30" />
               </svg>
             </motion.span>
           </h1>
           <motion.p className="sub" initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.4 }}>
-            Bygg och Projektgruppen samlar bygg, projektledning och entreprenad under ett
-            tak — nybyggnation, renovering, installation, mark och fastighet. Vi hjälper
-            till med det mesta, från första ritning till färdig överlämning med komplett
-            kvalitets- och miljödokumentation.
+            BOPG driver ditt byggprojekt som Construction Management-partner — rådgivare,
+            samordnare och projektledare genom hela kedjan. Du tecknar avtalen direkt med
+            entreprenörerna, vi håller i helheten.
           </motion.p>
           <motion.div className="actions" initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.46 }}>
             {/* Pekade tidigare på /tjanster, som arkiverades i och med omläggningen

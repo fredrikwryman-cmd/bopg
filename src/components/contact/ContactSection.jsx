@@ -10,7 +10,10 @@ import { Phone, Mail, MapPin } from '../icons.jsx';
 // ============================================================================
 const WEB3FORMS_KEY = 'PLACEHOLDER_BOPG_KEY';
 
-export default function ContactSection({ subject = 'Ny förfrågan från byggoprojektgruppen.se (Kontakt)' }) {
+// showHeading: sidor som redan har en PageHeader med samma rubrik (i dag
+// /kontakt) skickar false, annars dubbleras eyebrow + rubrik + ingress
+// ordagrant — en gång i den mörka sidhuvudet och en gång här.
+export default function ContactSection({ subject = 'Ny förfrågan från byggoprojektgruppen.se (Kontakt)', showHeading = true }) {
   const [form, setForm] = useState({ name: '', email: '', phone: '', projekttyp: '', message: '' });
   const [status, setStatus] = useState(null); // null | 'sending' | 'ok' | 'err'
   const [errorMsg, setErrorMsg] = useState('');
@@ -50,14 +53,16 @@ export default function ContactSection({ subject = 'Ny förfrågan från byggopr
   return (
     <section className="section stone" id="kontakt">
       <div className="wrap">
-        <motion.div initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}>
-          <span className="sec-ey">Kontakt</span>
-          <h2 className="sec-h">Hör av dig</h2>
-          <p className="sec-intro">
-            Berätta om ditt projekt så återkommer vi så snart vi kan. Vill du ha vår
-            prislista för löpande arbeten? Säg till.
-          </p>
-        </motion.div>
+        {showHeading && (
+          <motion.div initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}>
+            <span className="sec-ey">Kontakt</span>
+            <h2 className="sec-h">Hör av dig</h2>
+            <p className="sec-intro">
+              Berätta om ditt projekt så återkommer vi så snart vi kan. Vill du ha vår
+              prislista för löpande arbeten? Säg till.
+            </p>
+          </motion.div>
+        )}
 
         <div className="contact">
           <div>
@@ -94,18 +99,15 @@ export default function ContactSection({ subject = 'Ny förfrågan från byggopr
                   <label htmlFor="c-phone">Telefon</label>
                   <input id="c-phone" name="phone" type="tel" autoComplete="tel" placeholder="070-000 00 00" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
                 </div>
+                {/* Var en rullgardin med de sex hantverkstjänsterna. De arkiverades när
+                    BOPG lades om mot CM-uppdrag, och listan var sajtens sista ställe
+                    som sålde utförande hantverk. Fritext i stället: CM-uppdrag går
+                    inte att kategorisera i förväg, och fältet är ändå valfritt.
+                    Web3Forms tar emot fältet som vanlig sträng precis som förr —
+                    ingen validering och inget backend-schema påverkas. */}
                 <div className="field">
-                  <label htmlFor="c-type">Projekttyp</label>
-                  <select id="c-type" name="projekttyp" value={form.projekttyp} onChange={(e) => setForm({ ...form, projekttyp: e.target.value })}>
-                    <option value="">Välj projekttyp (valfritt)</option>
-                    <option value="Nybyggnation">Nybyggnation</option>
-                    <option value="Bygg & renovering">Bygg & renovering</option>
-                    <option value="Ytskikt">Ytskikt</option>
-                    <option value="El & VVS">El & VVS</option>
-                    <option value="Mark & plåt">Mark & plåt</option>
-                    <option value="Smide & rostfritt">Smide & rostfritt</option>
-                    <option value="Annat">Annat</option>
-                  </select>
+                  <label htmlFor="c-type">Kort om ditt projekt</label>
+                  <input id="c-type" name="projekttyp" type="text" placeholder="T.ex. nyproduktion, ombyggnad, renovering av kommersiella lokaler..." value={form.projekttyp} onChange={(e) => setForm({ ...form, projekttyp: e.target.value })} />
                 </div>
                 <div className="field">
                   <label htmlFor="c-msg">Meddelande</label>

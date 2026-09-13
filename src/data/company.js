@@ -22,6 +22,10 @@ export const company = {
   email: 'Andreas@byggoprojektgruppen.se',
   emailHref: 'mailto:Andreas@byggoprojektgruppen.se',
   address: 'Sågvägen 33, 184 40 Åkersberga',
+  // Verksamhetens position. Samma värden som kartnålen på kontaktsidan använder
+  // — ändras de ena måste de andra följa med (ContactSection.jsx, OSM-inbäddningen).
+  latitude: 59.479691,
+  longitude: 18.288373,
   ceo: 'Andreas Berndt Dahlgren',
   seat: 'Österåker, Stockholms län',
   founded: '2026',

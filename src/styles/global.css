@@ -37,12 +37,18 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
+/* Ingen overflow-x: hidden här. Den låg tidigare på body och maskerade ett
+   verkligt spill i stället för att visa det — regeln propagerar till viewporten,
+   kan slå sönder position: sticky, och gör att nästa för breda element aldrig
+   upptäcks. Spillet är åtgärdat vid källan (se .citem nedan). Kontrollerat utan
+   mask på alla fem sidor i 320, 360, 390, 414, 480, 768, 900, 1280 och 1440 px:
+   scrollWidth överstiger aldrig viewporten. Lägg inte tillbaka regeln — leta
+   upp elementet som är för brett i stället. */
 body {
   font-family: 'Manrope', system-ui, sans-serif;
   background: var(--paper);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
 }
 a { text-decoration: none; color: inherit; }
 h1, h2, h3 { font-family: 'Archivo', sans-serif; line-height: 1; }
@@ -216,11 +222,17 @@ h1, h2, h3 { font-family: 'Archivo', sans-serif; line-height: 1; }
 .contact { display: grid; grid-template-columns: 1fr 1fr; gap: 2.4rem; margin-top: 3rem; align-items: stretch; }
 @media (max-width: 900px) { .contact { grid-template-columns: 1fr; } }
 .cinfo { display: flex; flex-direction: column; gap: 1.1rem; margin-bottom: 2rem; }
+/* Textkolumnen måste få krympa. Flexbarn har min-width: auto, alltså aldrig
+   smalare än sitt innehåll, och e-postadressen är ett enda obrytbart ord. Vid
+   360 px blev .cv 282 px bred med högerkanten på 363 px — exakt sidans
+   scrollWidth, alltså 3 px horisontell scroll på mobil. min-width: 0 låter
+   kolumnen krympa, overflow-wrap: anywhere ger adressen en brytpunkt. */
 .citem { display: flex; align-items: center; gap: 1rem; }
+.citem > span:last-child, .citem > div:last-child { min-width: 0; }
 .citem .ci { width: 44px; height: 44px; flex: none; border-radius: 3px; background: rgba(31,78,150,.08); color: var(--blue); display: flex; align-items: center; justify-content: center; }
 .citem .ci svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .citem .cl { font-family: 'Space Mono', monospace; font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
-.citem .cv { font-size: 1.06rem; font-weight: 600; color: var(--ink); }
+.citem .cv { font-size: 1.06rem; font-weight: 600; color: var(--ink); overflow-wrap: anywhere; }
 .cform .field { margin-bottom: 1rem; }
 .cform label { display: block; font-family: 'Space Mono', monospace; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; }
 .cform input, .cform textarea, .cform select { width: 100%; background: #fff; border: 1px solid var(--line); border-radius: 3px; padding: .85rem 1rem; font-family: 'Manrope', sans-serif; font-size: 1rem; color: var(--ink); transition: border-color .25s, box-shadow .25s; }

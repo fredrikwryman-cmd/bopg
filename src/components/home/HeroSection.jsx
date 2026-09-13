@@ -3,7 +3,15 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 
 const BASE = import.meta.env.BASE_URL;
 
-const ticker = ['Bygg', 'Projektledning', 'Entreprenad', 'Renovering', 'El & VVS', 'Mark & plåt', 'Smide'];
+// Banderollen listar gruppens bolag sedan BOPG lades om mot CM-uppdrag.
+// Tidigare låg sju enskilda hantverkstjänster här, vilket sa utförande
+// entreprenör — tvärtemot CM-rollen.
+const ticker = [
+  'AD Byggprojekt — Entreprenad & totalentreprenad',
+  'Bolag 02 — CM-uppdrag, namn inom kort',
+  'Bolag 03 — CM-uppdrag, namn inom kort',
+  'Bolag 04 — CM-uppdrag, namn inom kort',
+];
 
 export default function HeroSection() {
   const ref = useRef(null);
@@ -72,7 +80,7 @@ export default function HeroSection() {
           <div className="mq-track">
             {[...ticker, ...ticker].map((t, i) => (
               <span key={i} style={{ display: 'flex', alignItems: 'center' }}>
-                <span className={'mq-item' + (t === 'Bygg' ? ' first' : '')}>{t}</span>
+                <span className={'mq-item' + (i % ticker.length === 0 ? ' first' : '')}>{t}</span>
                 <span className="mq-sep">&bull;</span>
               </span>
             ))}

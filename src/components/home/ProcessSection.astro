@@ -66,14 +66,14 @@ const steps = [
       section.classList.add('is-running');
       steps.classList.add('is-running');
 
-      // När sekvensen är färdigspelad (1090 ms + marginal) plockas klasserna
+      // När sekvensen är färdigspelad (1820 ms + marginal) plockas klasserna
       // bort helt. DOM:en står då i exakt samma läge som utan JS: inga
       // clip-path, inga transforms, inga transitions kvar att snubbla på.
       // Sekvensen körs alltså alltid klart, oavsett var besökaren scrollat.
       window.setTimeout(() => {
         section.classList.remove('is-armed', 'is-running');
         steps.classList.remove('is-armed', 'is-running');
-      }, 1500);
+      }, 2300);
     };
 
     if (!('IntersectionObserver' in window)) {
@@ -81,14 +81,16 @@ const steps = [
       return;
     }
 
-    // threshold mäts mot sektionens EGEN höjd. 0,35 är rätt på desktop, men på
-    // mobil staplas stegen och sektionen blir högre än skärmen — då kan 35 %
-    // aldrig hinna synas samtidigt. Därför tas det lägsta av 0,35 och "knappt
-    // en halv skärmhöjd av sektionen syns", vilket ger samma upplevelse oavsett
-    // sektionshöjd.
+    // threshold mäts mot sektionens EGEN höjd. Sekvensen är 1820 ms lång, så
+    // den måste starta när sektionen kommer in i vyn — inte när en tredjedel av
+    // den redan är passerad. Därför 0,15 i stället för 0,35: hinner besökaren
+    // skrolla vidare är sekvensen ändå igång och spelar klart.
+    // På mobil staplas stegen och sektionen blir högre än skärmen, så värdet
+    // kapas dessutom av "knappt en halv skärmhöjd av sektionen syns", vilket
+    // ger samma upplevelse oavsett sektionshöjd.
     const vh = window.innerHeight || document.documentElement.clientHeight || 1;
     const h = section.getBoundingClientRect().height || 1;
-    const threshold = Math.min(0.35, (vh * 0.45) / h);
+    const threshold = Math.min(0.15, (vh * 0.45) / h);
 
     const io = new IntersectionObserver(
       (entries) => {
@@ -158,14 +160,17 @@ const steps = [
   }
 
   /* Fördröjningar per steg. --i sätts i markupen.
-     Linjen: 0 → 760 ms. Numren tänds i takt med att den passerar dem
-     (120/290/460/630 ms), rubriken +90 ms efter sitt nummer och brödtexten
-     +90 ms efter rubriken. Sista brödtexten startar 810 ms och är klar
-     1090 ms — hela sekvensen ryms alltså under 1,1 s. */
+     Det som gör sekvensen läsbar är avståndet MELLAN stegen, inte att varje
+     rörelse är långsam — därför växer intervallen (170 → 340 ms) medan de
+     enskilda rörelserna behåller sin skärpa.
+     Linjen: 0 → 1400 ms. Numren tänds i takt med att den passerar dem
+     (220/560/900/1240 ms), rubriken +120 ms efter sitt nummer och brödtexten
+     +120 ms efter rubriken. Sista brödtexten startar 1480 ms och är klar
+     1820 ms. */
   .steps.is-armed .step {
-    --d-node: calc(120ms + var(--i) * 170ms);
-    --d-title: calc(210ms + var(--i) * 170ms);
-    --d-text: calc(300ms + var(--i) * 170ms);
+    --d-node: calc(220ms + var(--i) * 340ms);
+    --d-title: calc(340ms + var(--i) * 340ms);
+    --d-text: calc(460ms + var(--i) * 340ms);
   }
 
   /* ==========================================================================
@@ -182,9 +187,13 @@ const steps = [
   }
 
   /* 1. Linjen ritas från vänster. */
+  /* Easingen är dämpad jämfört med den korta versionen. Över 1400 ms skulle
+     cubic-bezier(0.22, 1, 0.36, 1) vara 66 % färdig redan efter 270 ms och
+     sedan krypa i mål — linjen skulle se ut att stanna. Den här kurvan håller
+     nästan jämn fart genom mitten och bromsar tydligt in i slutläget. */
   .steps.is-armed.is-running::before {
     transform: scaleX(1);
-    transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 1400ms cubic-bezier(0.5, 0.1, 0.35, 1);
   }
 
   /* 2. Numren tänds: färg/fyllnad plus en diskret studs, och en ring som
@@ -194,15 +203,15 @@ const steps = [
     border-color: var(--gold);
     color: var(--blue);
     transition:
-      background-color 250ms ease-out,
-      border-color 250ms ease-out,
-      color 250ms ease-out;
+      background-color 300ms ease-out,
+      border-color 300ms ease-out,
+      color 300ms ease-out;
     transition-delay: var(--d-node);
-    animation: node-pop 250ms cubic-bezier(0.34, 1.28, 0.64, 1) var(--d-node) both;
+    animation: node-pop 300ms cubic-bezier(0.34, 1.28, 0.64, 1) var(--d-node) both;
   }
 
   .steps.is-armed.is-running .step .node::after {
-    animation: node-ring 460ms ease-out var(--d-node) both;
+    animation: node-ring 520ms ease-out var(--d-node) both;
   }
 
   @keyframes node-pop {
@@ -222,8 +231,8 @@ const steps = [
     clip-path: inset(0 0 0 0);
     transform: translateX(0);
     transition:
-      clip-path 280ms cubic-bezier(0.22, 1, 0.36, 1),
-      transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+      clip-path 340ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 340ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .steps.is-armed.is-running .step h3 {
@@ -237,13 +246,14 @@ const steps = [
   /* ==========================================================================
      MOBIL — under 820 px staplas stegen och guldlinjen är dold i global.css.
      Desktopgeometrin tvingas därför inte in: varje block wipe:as för sig med
-     80 ms emellan. Hela sekvensen är klar på ~640 ms.
+     150 ms emellan. Här skrollar man igenom stegen, så sekvensen hålls kvickare
+     än på desktop — sista brödtexten startar 770 ms och är klar 1110 ms.
      ========================================================================== */
   @media (max-width: 820px) {
     .steps.is-armed .step {
-      --d-node: calc(var(--i) * 80ms);
-      --d-title: calc(60ms + var(--i) * 80ms);
-      --d-text: calc(120ms + var(--i) * 80ms);
+      --d-node: calc(var(--i) * 150ms);
+      --d-title: calc(160ms + var(--i) * 150ms);
+      --d-text: calc(320ms + var(--i) * 150ms);
     }
   }
 

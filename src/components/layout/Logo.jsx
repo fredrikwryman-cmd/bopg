@@ -17,10 +17,17 @@ export default function Logo({ tag = true }) {
         aria-hidden="true"
       />
       <div>
+        {/* Namnets två delar ligger i var sitt .wm-span. På mobil får ordmärket
+            radbrytas, och spannen ser då till att brytningen bara kan ske MELLAN
+            delarna — aldrig mitt i "Projekt Gruppen". Utan dem kollapsade
+            textkolumnen till sin minsta innehållsbredd och bröt ord för ord. */}
         <b>
-          {company.wordmark[0]} <span className="amp">&amp;</span> {company.wordmark[1]}
+          <span className="wm">
+            {company.wordmark[0]} <span className="amp">&amp;</span>
+          </span>{' '}
+          <span className="wm">{company.wordmark[1]}</span>
         </b>
-        {tag && <span>SAMLAD BYGGEXPERTIS · STOCKHOLM</span>}
+        {tag && <span className="tagline">SAMLAD BYGGEXPERTIS · STOCKHOLM</span>}
       </div>
     </>
   );

@@ -1,0 +1,131 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/layout/Navbar.jsx';
+import Footer from '../components/layout/Footer.jsx';
+import PageHeader from '../components/pages/PageHeader.jsx';
+import { company } from '../data/company.js';
+---
+
+<Layout
+  title="Integritetspolicy | Bygg & Projektgruppen i Stockholm AB"
+  description="Så behandlar Bygg och Projektgruppen i Stockholm AB personuppgifter som lämnas via webbplatsens kontaktformulär."
+>
+  <Navbar client:idle />
+  <main>
+    <PageHeader
+      client:load
+      eyebrow="Integritet"
+      title="Integritetspolicy"
+      subtitle="Så behandlar vi de personuppgifter du lämnar via den här webbplatsen."
+      crumbs={[{ label: 'Integritetspolicy' }]}
+    />
+
+    <section class="section">
+      {/* .legal ligger INUTI .wrap, inte på samma element. .wrap har margin: 0 auto,
+          så en max-width direkt på den centrerar textspalten — då hamnade brödtexten
+          268 px till höger om h1:an i sidhuvudet ovanför. Som eget barn vänsterställs
+          spalten i stället och linjerar med rubriken, precis som .sec-intro gör. */}
+      <div class="wrap">
+        <div class="legal">
+          <h2>Personuppgiftsansvarig</h2>
+          <p>
+            {company.legalName}, org.nr {company.orgNr}, är personuppgiftsansvarig för de
+            uppgifter som samlas in via den här webbplatsen. Vid frågor, kontakta oss på
+            <a href={company.emailHref}>{company.email}</a>.
+          </p>
+
+          <h2>Vilka uppgifter vi samlar in</h2>
+          <p>
+            När du använder kontaktformuläret samlar vi in de uppgifter du själv lämnar:
+            namn, e-postadress och den projektbeskrivning du skriver. Övriga uppgifter du
+            eventuellt lämnar (t.ex. telefonnummer) är frivilliga.
+          </p>
+
+          <h2>Varför vi samlar in dem</h2>
+          <p>
+            Enda syftet är att kunna besvara din förfrågan och återkomma till dig om ditt
+            byggprojekt. Vi använder inte uppgifterna för marknadsföring och säljer eller
+            delar dem inte vidare till tredje part i något annat syfte.
+          </p>
+
+          <h2>Hur uppgifterna hanteras</h2>
+          <p>
+            Kontaktformuläret skickas via tredjepartstjänsten Web3Forms, som vidarebefordrar
+            meddelandet till oss via e-post. Web3Forms behandlar uppgifterna som ett
+            personuppgiftsbiträde åt oss i samband med detta.
+          </p>
+
+          <h2>Lagringstid</h2>
+          <p>
+            Vi sparar uppgifterna så länge det krävs för att hantera din förfrågan, och
+            raderar dem därefter.
+          </p>
+
+          <h2>Dina rättigheter</h2>
+          <p>
+            Enligt dataskyddsförordningen (GDPR) har du rätt att begära tillgång till,
+            rättelse av eller radering av dina personuppgifter, samt att invända mot vår
+            behandling. Kontakta oss på <a href={company.emailHref}>{company.email}</a> för
+            att utöva dina rättigheter. Du har även rätt att lämna klagomål till
+            Integritetsskyddsmyndigheten (IMY).
+          </p>
+
+          {/* Texten här är inte antagen utan kontrollerad: sökning i källkoden gav noll
+              träffar på gtag, Google Analytics, Tag Manager, Plausible, Matomo, Meta Pixel,
+              Clarity, document.cookie, localStorage och sessionStorage. Kontrollerat även i
+              webbläsaren på den byggda sajten — document.cookie tomt, localStorage och
+              sessionStorage tomma, inga externa script-taggar. Enda tredjepartsvärden som
+              kontaktas är www.openstreetmap.org, via kartans iframe på kontaktsidan, och
+              den nämns därför uttryckligen nedan. Ändras något av detta måste stycket
+              uppdateras. */}
+          <h2>Cookies</h2>
+          <p>
+            Den här webbplatsen använder inga spårningscookies eller analysverktyg. På
+            kontaktsidan visas en karta som bäddas in från OpenStreetMap. Kartan laddas från
+            openstreetmap.org, och den tjänsten kan i sin tur sätta egna kakor. Utöver det
+            lagrar vi ingenting i din webbläsare.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  /* Ingen ny formgivning — bara läsbar löptext byggd på sajtens befintliga tokens.
+     Rubrikerna använder .sec-h:s typsnitt och versaler men i en mindre grad, eftersom
+     sidan har sju underrubriker i rad och displaygraden (upp till 3.4rem) skulle göra
+     den till en affisch i stället för en policy. */
+  .legal {
+    max-width: 44rem;
+  }
+  .legal h2 {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 900;
+    font-size: clamp(1.15rem, 2vw, 1.4rem);
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    line-height: 1.15;
+    color: var(--ink);
+    margin-top: 2.6rem;
+  }
+  .legal h2:first-child {
+    margin-top: 0;
+  }
+  .legal p {
+    margin-top: 0.9rem;
+    font-size: 1.02rem;
+    line-height: 1.75;
+    color: var(--slate);
+  }
+  .legal a {
+    color: var(--blue);
+    border-bottom: 1px solid rgba(31, 78, 150, 0.35);
+    padding-bottom: 0.05rem;
+    transition: border-color 0.2s ease;
+  }
+  .legal a:hover {
+    border-bottom-color: var(--blue);
+  }
+</style>

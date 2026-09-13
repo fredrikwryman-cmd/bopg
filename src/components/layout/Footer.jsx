@@ -26,7 +26,10 @@ export default function Footer() {
       </div>
       <div className="foot-bot">
         <span>© {year} BYGG OCH PROJEKT GRUPPEN I STOCKHOLM AB</span>
-        <span>ORG.NR {company.orgNr} · ÅKERSBERGA</span>
+        <span>
+          <a href="/integritetspolicy">Integritetspolicy</a>
+          {' · '}ORG.NR {company.orgNr} · ÅKERSBERGA
+        </span>
       </div>
     </footer>
   );

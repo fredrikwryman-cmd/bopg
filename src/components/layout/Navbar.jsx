@@ -4,7 +4,6 @@ import Logo from './Logo.jsx';
 const BASE = import.meta.env.BASE_URL;
 
 const links = [
-  { label: 'Tjänster', href: BASE + 'tjanster' },
   { label: 'Så jobbar vi', href: BASE + '#process' },
   { label: 'Om oss', href: BASE + 'om-oss' },
   { label: 'Kontakt', href: BASE + 'kontakt' },

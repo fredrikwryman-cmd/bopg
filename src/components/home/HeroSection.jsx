@@ -56,8 +56,12 @@ export default function HeroSection() {
             kvalitets- och miljödokumentation.
           </motion.p>
           <motion.div className="actions" initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.46 }}>
-            <a className="btn btn-primary" href={BASE + 'tjanster'}>
-              <span className="fill" /><span className="lbl">Se våra tjänster</span><span className="arrow">&rarr;</span>
+            {/* Pekade tidigare på /tjanster, som arkiverades i och med omläggningen
+                mot CM-uppdrag. Länken gick till en 404. Riktad om till den nya
+                bolagssektionen tills vidare — byt mål när CM-erbjudandet har en
+                egen sida. */}
+            <a className="btn btn-primary" href={BASE + '#bolag'}>
+              <span className="fill" /><span className="lbl">Våra bolag</span><span className="arrow">&rarr;</span>
             </a>
             <a className="btn btn-ghost" href={BASE + 'kontakt'}>Kontakta oss</a>
           </motion.div>

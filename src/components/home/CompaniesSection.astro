@@ -1,0 +1,346 @@
+---
+// VÅRA BOLAG — startsidans gruppsektion.
+//
+// BYGGD SOM .astro, INTE SOM REACT-Ö MED FRAMER MOTION. Direktivet föreslog
+// Framer Motion, men whileInView kräver initial={{ opacity: 0 }}, och det
+// serverrenderar `style="opacity:0"` rakt in i HTML:en. Det är exakt felet som
+// redan finns på sajten (22 element osynliga utan JS) och som direktivet i
+// samma andetag pekar ut som kritiskt att undvika. Mönstret här är i stället
+// samma som BrandVideo.astro: ren markup + CSS som grundtillstånd, och ett
+// litet script som lägger på rörelsen.
+//
+// GRUNDTILLSTÅNDET ÄR SYNLIGT. Korten har full opacity i CSS. Först när
+// scriptet kört sätts klassen `is-js` på sektionen — och det är den klassen,
+// inte markupen, som döljer korten inför intoningen. Utan JS finns klassen
+// aldrig, och sektionen ser helt normal ut.
+//
+// Scriptet ligger som inline-modul i samma fil och körs under parsningen, före
+// första målningen, så ingen blixt av synliga kort hinner visas.
+
+const companies = [
+  {
+    name: 'AD Byggprojekt',
+    text: 'Entreprenad — nybyggnation, renovering, totalentreprenad. Systerbolag till BOPG.',
+    // Sätt `url` här när adressen är permanent, så byts badgen automatiskt mot
+    // en riktig länk. Ingen strukturändring krävs.
+    url: null,
+    badge: 'Länk tillkommer',
+  },
+  {
+    name: 'Bolag 02',
+    text: 'CM-uppdrag inom specialitet som ännu inte är fastställd.',
+    url: null,
+    badge: 'Sajt under uppbyggnad',
+  },
+  {
+    name: 'Bolag 03',
+    text: 'CM-uppdrag inom specialitet som ännu inte är fastställd.',
+    url: null,
+    badge: 'Sajt under uppbyggnad',
+  },
+  {
+    name: 'Bolag 04',
+    text: 'CM-uppdrag inom specialitet som ännu inte är fastställd.',
+    url: null,
+    badge: 'Sajt under uppbyggnad',
+  },
+];
+---
+
+<section class="companies" id="bolag">
+  <!-- Dekorativt ordmärke bakom kortraden. Rent visuellt: den riktiga
+       rubriken är h2:an nedan, som alltid finns i DOM. -->
+  <div class="companies-deco" aria-hidden="true">
+    <span class="companies-deco-word">VÅRA BOLAG</span>
+  </div>
+
+  <div class="wrap companies-in">
+    <span class="sec-ey">Gruppen</span>
+    <h2 class="sec-h">Våra bolag</h2>
+    <p class="sec-intro">
+      Bygg &amp; Projektgruppen är navet i en grupp bolag som tillsammans täcker
+      hela kedjan — från byggherrens första idé till färdig överlämning.
+    </p>
+
+    <ul class="companies-grid">
+      {companies.map((c, i) => (
+        <li class="company-card" style={`--i:${i}`}>
+          <span class="company-idx mono">{String(i + 1).padStart(2, '0')}</span>
+          <h3 class="company-name">{c.name}</h3>
+          <p class="company-text">{c.text}</p>
+          {c.url ? (
+            <a class="company-link" href={c.url}>
+              Till sajten<span class="company-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          ) : (
+            <span class="company-badge mono">{c.badge}</span>
+          )}
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<script>
+  // Progressiv förbättring. Allt här är tillägg — utan det här scriptet är
+  // sektionen fullt läsbar, bara utan rörelse.
+  const section = document.querySelector('.companies');
+
+  if (section) {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!reduced) {
+      // Klassen som slår om korten till dolt starttillstånd. Sätts synkront
+      // under parsningen, alltså före första målningen — därför hinner inga
+      // synliga kort blinka förbi.
+      section.classList.add('is-js');
+
+      const reveal = () => section.classList.add('is-in');
+
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (!e.isIntersecting) return;
+              reveal();
+              io.disconnect();
+            });
+          },
+          // threshold mäts mot sektionens EGEN höjd, inte mot skärmen. Ett
+          // ratio-värde (t.ex. 0.12) blir därför olika mycket scrollning på
+          // olika skärmar: på mobil staplas korten och sektionen blir dryga
+          // 1300 px hög, så 12 % motsvarar ~156 px in i sektionen — korten
+          // hinner synas innan intoningen startar och poppar till.
+          // threshold 0 + negativ nedre rootMargin utlöser i stället när
+          // sektionens överkant passerat 12 % upp i vyn, vilket är samma
+          // upplevelse oavsett sektionshöjd och skärmstorlek.
+          { rootMargin: '0px 0px -12% 0px', threshold: 0 },
+        );
+        io.observe(section);
+      } else {
+        // Utan IntersectionObserver: visa direkt hellre än att riskera att
+        // korten aldrig tonar in.
+        reveal();
+      }
+
+      // Parallax på det dekorativa ordmärket. Håller sig medvetet inom
+      // ±PARALLAX px — tillräckligt för att ordet ska halka efter kortraden,
+      // för lite för att kännas som en effekt i sig.
+      const deco = section.querySelector('.companies-deco-word');
+
+      if (deco) {
+        const PARALLAX = 34;
+        let ticking = false;
+
+        const update = () => {
+          ticking = false;
+          const r = section.getBoundingClientRect();
+          const vh = window.innerHeight || document.documentElement.clientHeight;
+          // Utanför vy: rör ingenting, och spar arbete.
+          if (r.bottom < 0 || r.top > vh) return;
+          // progress: 0 när sektionens överkant möter nederkanten av vyn,
+          // 1 när sektionens underkant lämnat överkanten av vyn.
+          const progress = (vh - r.top) / (vh + r.height);
+          const offset = (progress - 0.5) * 2 * PARALLAX;
+          deco.style.transform = `translate3d(0, ${offset.toFixed(1)}px, 0)`;
+        };
+
+        const onScroll = () => {
+          if (ticking) return;
+          ticking = true;
+          requestAnimationFrame(update);
+        };
+
+        update();
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onScroll, { passive: true });
+      }
+    }
+  }
+</script>
+
+<style>
+  .companies {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(4.5rem, 9vw, 7rem) 2rem;
+    background: var(--paper);
+  }
+
+  /* ---------- dekorativt ordmärke ---------- */
+  .companies-deco {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    user-select: none;
+    overflow: hidden;
+  }
+  .companies-deco-word {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    font-size: clamp(4rem, 15vw, 13rem);
+    line-height: 1;
+    /* Svag ton mot papper — ska kännas som en tryckt skugga i pappret, inte
+       som text man försöker läsa. */
+    color: rgba(34, 42, 51, 0.055);
+    will-change: transform;
+  }
+
+  /* ---------- innehåll ---------- */
+  .companies-in {
+    position: relative;
+    z-index: 1;
+  }
+
+  .companies-grid {
+    list-style: none;
+    margin-top: clamp(2.2rem, 4vw, 3.2rem);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1rem, 2vw, 1.6rem);
+  }
+
+  .company-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: clamp(1.5rem, 2.6vw, 2.2rem);
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    backdrop-filter: blur(2px);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .company-card::before {
+    /* Guldmarkering i överkant — samma språk som .ba-label och .sd-inc. */
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    width: 46px;
+    height: 3px;
+    background: var(--gold);
+    border-radius: 5px 0 0 0;
+  }
+  .company-card:hover {
+    border-color: rgba(34, 42, 51, 0.28);
+    box-shadow: 0 26px 54px -34px rgba(34, 42, 51, 0.5);
+  }
+
+  .company-idx {
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    color: var(--blue);
+  }
+  .company-name {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 900;
+    font-size: clamp(1.35rem, 2.2vw, 1.85rem);
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    line-height: 1.05;
+  }
+  .company-text {
+    font-size: 0.98rem;
+    line-height: 1.65;
+    color: var(--slate);
+    max-width: 30rem;
+  }
+
+  .company-badge {
+    margin-top: 0.35rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px dashed rgba(34, 42, 51, 0.28);
+    border-radius: 2px;
+    padding: 0.34rem 0.7rem;
+  }
+  .company-link {
+    margin-top: 0.35rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--blue);
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 0.15rem;
+  }
+  .company-link .company-arrow {
+    transition: transform 0.25s ease;
+  }
+  .company-link:hover .company-arrow {
+    transform: translateX(4px);
+  }
+
+  /* ---------- rörelse (endast med JS) ----------
+     Grundtillståndet ovan är synligt. Först klassen .is-js — som bara ett
+     körande script kan sätta — döljer korten, och .is-in tonar in dem igen.
+     Utan JS finns ingen av klasserna och korten står kvar fullt synliga. */
+  .companies.is-js .company-card {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  .companies.is-js.is-in .company-card {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    /* Staggad start: 90 ms mellan korten. --i sätts per kort i markupen. */
+    transition-delay: calc(var(--i) * 90ms);
+  }
+
+  /* ---------- responsivt ---------- */
+  @media (max-width: 860px) {
+    .companies-deco-word {
+      font-size: clamp(3.2rem, 17vw, 7rem);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .companies {
+      padding-left: 1.3rem;
+      padding-right: 1.3rem;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .companies-grid {
+      grid-template-columns: 1fr;
+    }
+    /* Det dekorativa ordet ryms inte på mobil utan att bli grötigt bakom
+       korten — det tas bort helt i stället för att krympas till oläslighet.
+       Kortens stagger blir kvar. */
+    .companies-deco {
+      display: none;
+    }
+  }
+
+  /* ---------- reducerad rörelse ----------
+     Scriptet hoppar redan över både .is-js och parallaxen vid reduce, men
+     regeln ligger kvar som spärr ifall klassen sätts på annat sätt. */
+  @media (prefers-reduced-motion: reduce) {
+    .companies.is-js .company-card {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    .companies-deco-word {
+      transform: none !important;
+    }
+  }
+</style>

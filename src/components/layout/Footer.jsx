@@ -1,7 +1,4 @@
 import { company } from '../../data/company.js';
-import { services } from '../../data/services.js';
-
-const BASE = import.meta.env.BASE_URL;
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -16,17 +13,6 @@ export default function Footer() {
             renovering, entreprenad och allt däremellan — från första ritning till
             färdig överlämning.
           </p>
-        </div>
-        <div>
-          <h2>Tjänster</h2>
-          <ul>
-            {services.slice(0, 4).map((s) => (
-              <li key={s.slug}>
-                <a href={BASE + 'tjanster/' + s.slug}>{s.title}</a>
-              </li>
-            ))}
-            <li><a href={BASE + 'tjanster'}>Alla tjänster</a></li>
-          </ul>
         </div>
         <div>
           <h2>Kontakt</h2>

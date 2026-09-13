@@ -5,7 +5,7 @@ import Navbar from '../components/layout/Navbar.jsx';
 import Footer from '../components/layout/Footer.jsx';
 import PageHeader from '../components/pages/PageHeader.jsx';
 import AboutSection from '../components/home/AboutSection.jsx';
-import ProcessSection from '../components/home/ProcessSection.jsx';
+import ProcessSection from '../components/home/ProcessSection.astro';
 import ContactSection from '../components/contact/ContactSection.jsx';
 ---
 
@@ -23,7 +23,7 @@ import ContactSection from '../components/contact/ContactSection.jsx';
       crumbs={[{ label: 'Om oss' }]}
     />
     <AboutSection client:visible withLink={false} />
-    <ProcessSection client:visible />
+    <ProcessSection />
     <ContactSection client:visible subject="Ny förfrågan från byggoprojektgruppen.se (Om oss)" />
   </main>
   <Footer />

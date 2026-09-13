@@ -1,0 +1,277 @@
+---
+// SÅ JOBBAR VI — "Tryggt från offert till överlämning".
+//
+// BYGGD SOM .astro, INTE SOM REACT-Ö MED FRAMER MOTION. Tidigare låg de fyra
+// stegen på motion.div med initial={{ opacity: 0 }}, vilket serverrenderar
+// style="opacity:0" rakt in i HTML:en — utan JavaScript var sektionen tom.
+// Samma noscript-fel som CompaniesSection.astro redan byggts bort ifrån, och
+// mönstret här är medvetet identiskt med den filen.
+//
+// GRUNDTILLSTÅNDET ÄR DET FÄRDIGA. Ingen statisk CSS döljer eller förskjuter
+// något: utan JS står linjen, siffrorna, rubrikerna och brödtexten fullt
+// synliga. Först när scriptet lägger klassen `is-armed` på .steps (och på
+// sektionen, för rubrikblocket) får elementen sitt STARTLÄGE, och `is-running`
+// spelar sekvensen därifrån. Felet går därför inte att återinföra av misstag —
+// det finns ingen dold-som-default att glömma att slå av.
+//
+// Copyn nedan är oförändrad. Rör den inte utan eget direktiv.
+
+const steps = [
+  { n: '01', title: 'Planering', text: 'Vi får bäst resultat när beställningen kommer i god tid. Vi planerar noggrant så att rätt sak görs i rätt ordning.' },
+  { n: '02', title: 'Fast pris i första hand', text: 'Vi eftersträvar fasta priser och tydliga offerter, så att du vet vad projektet kostar innan det börjar.' },
+  { n: '03', title: 'Kvalitet & miljö', text: 'Efter utfört arbete levererar vi alltid relevant kvalitets- och miljödokumentation — inget lämnas åt slumpen.' },
+  { n: '04', title: 'En kontakt', text: 'Brett kunnande samlat på ett ställe. Du har en kontakt genom hela projektet, från första ritning till färdigt.' },
+];
+---
+
+<section class="section stone" id="process" data-process>
+  <div class="wrap">
+    <div class="process-head">
+      <span class="sec-ey">Så jobbar vi</span>
+      <h2 class="sec-h">Tryggt från<br />offert till överlämning</h2>
+    </div>
+
+    <div class="steps">
+      {steps.map((s, i) => (
+        <div class="step" style={`--i:${i}`}>
+          <div class="node">{s.n}</div>
+          <h3>{s.title}</h3>
+          <p>{s.text}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  // Progressiv förbättring. Allt här är tillägg — utan scriptet är sektionen
+  // fullt läsbar, bara utan rörelse.
+  document.querySelectorAll('[data-process]').forEach((section) => {
+    const steps = section.querySelector('.steps');
+    if (!steps) return;
+
+    // Reducerad rörelse: arma aldrig. Sektionen blir stående i sitt färdiga
+    // läge — ingen rörelse alls, inte en snabbare variant.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // Klasserna som slår om till startläget. Sätts före observern, så att
+    // ingenting hinner målas i färdigt läge och sedan hoppa tillbaka.
+    section.classList.add('is-armed');
+    steps.classList.add('is-armed');
+
+    let started = false;
+    const run = () => {
+      if (started) return;
+      started = true;
+      section.classList.add('is-running');
+      steps.classList.add('is-running');
+
+      // När sekvensen är färdigspelad (1090 ms + marginal) plockas klasserna
+      // bort helt. DOM:en står då i exakt samma läge som utan JS: inga
+      // clip-path, inga transforms, inga transitions kvar att snubbla på.
+      // Sekvensen körs alltså alltid klart, oavsett var besökaren scrollat.
+      window.setTimeout(() => {
+        section.classList.remove('is-armed', 'is-running');
+        steps.classList.remove('is-armed', 'is-running');
+      }, 1500);
+    };
+
+    if (!('IntersectionObserver' in window)) {
+      run();
+      return;
+    }
+
+    // threshold mäts mot sektionens EGEN höjd. 0,35 är rätt på desktop, men på
+    // mobil staplas stegen och sektionen blir högre än skärmen — då kan 35 %
+    // aldrig hinna synas samtidigt. Därför tas det lägsta av 0,35 och "knappt
+    // en halv skärmhöjd av sektionen syns", vilket ger samma upplevelse oavsett
+    // sektionshöjd.
+    const vh = window.innerHeight || document.documentElement.clientHeight || 1;
+    const h = section.getBoundingClientRect().height || 1;
+    const threshold = Math.min(0.35, (vh * 0.45) / h);
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          run();
+          io.disconnect();
+        });
+      },
+      { threshold },
+    );
+    // Ligger sektionen redan i vyn vid sidladdning rapporterar observern det
+    // direkt vid observe() — sekvensen startar då omedelbart.
+    io.observe(section);
+  });
+</script>
+
+<style>
+  /* ==========================================================================
+     GRUNDLÄGE — gäller alltid, även utan JS.
+     Här finns medvetet INGEN opacity, transform eller clip-path som döljer
+     något. Basreglerna för .steps / .step / .node ligger i global.css.
+     ========================================================================== */
+
+  /* Guldlinjen är .steps::before i global.css (2 px, streckad, full bredd).
+     Den återanvänds som ritad linje — ingen ny linje byggs. transform-origin
+     är harmlös i vila och behöver därför inget klassvillkor. */
+  .steps::before {
+    transform-origin: left center;
+  }
+
+  /* Ringen som pulsar ut ur ett tänt nummer. Absolut positionerad, alltså
+     ingen flex-item i .node och utan påverkan på layouten. Osynlig i vila. */
+  .node::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    border: 1px solid var(--gold);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* ==========================================================================
+     STARTLÄGE — endast när scriptet armat sektionen.
+     ========================================================================== */
+
+  section.is-armed .process-head {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .steps.is-armed::before {
+    transform: scaleX(0);
+  }
+
+  .steps.is-armed .step .node {
+    background-color: transparent;
+    border-color: rgba(34, 42, 51, 0.15);
+    color: rgba(34, 42, 51, 0.28);
+  }
+
+  .steps.is-armed .step h3,
+  .steps.is-armed .step p {
+    clip-path: inset(0 100% 0 0);
+    transform: translateX(-8px);
+  }
+
+  /* Fördröjningar per steg. --i sätts i markupen.
+     Linjen: 0 → 760 ms. Numren tänds i takt med att den passerar dem
+     (120/290/460/630 ms), rubriken +90 ms efter sitt nummer och brödtexten
+     +90 ms efter rubriken. Sista brödtexten startar 810 ms och är klar
+     1090 ms — hela sekvensen ryms alltså under 1,1 s. */
+  .steps.is-armed .step {
+    --d-node: calc(120ms + var(--i) * 170ms);
+    --d-title: calc(210ms + var(--i) * 170ms);
+    --d-text: calc(300ms + var(--i) * 170ms);
+  }
+
+  /* ==========================================================================
+     SEKVENSEN — endast transform, opacity, clip-path och färg animeras.
+     Inget som utlöser layout, alltså ingen CLS.
+     ========================================================================== */
+
+  section.is-armed.is-running .process-head {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* 1. Linjen ritas från vänster. */
+  .steps.is-armed.is-running::before {
+    transform: scaleX(1);
+    transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* 2. Numren tänds: färg/fyllnad plus en diskret studs, och en ring som
+        expanderar ut med transform — aldrig med width/height. */
+  .steps.is-armed.is-running .step .node {
+    background-color: var(--paper-2);
+    border-color: var(--gold);
+    color: var(--blue);
+    transition:
+      background-color 250ms ease-out,
+      border-color 250ms ease-out,
+      color 250ms ease-out;
+    transition-delay: var(--d-node);
+    animation: node-pop 250ms cubic-bezier(0.34, 1.28, 0.64, 1) var(--d-node) both;
+  }
+
+  .steps.is-armed.is-running .step .node::after {
+    animation: node-ring 460ms ease-out var(--d-node) both;
+  }
+
+  @keyframes node-pop {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes node-ring {
+    0% { opacity: 0.5; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.85); }
+  }
+
+  /* 3. Rubrik och brödtext wipe:as fram från vänster. */
+  .steps.is-armed.is-running .step h3,
+  .steps.is-armed.is-running .step p {
+    clip-path: inset(0 0 0 0);
+    transform: translateX(0);
+    transition:
+      clip-path 280ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .steps.is-armed.is-running .step h3 {
+    transition-delay: var(--d-title);
+  }
+
+  .steps.is-armed.is-running .step p {
+    transition-delay: var(--d-text);
+  }
+
+  /* ==========================================================================
+     MOBIL — under 820 px staplas stegen och guldlinjen är dold i global.css.
+     Desktopgeometrin tvingas därför inte in: varje block wipe:as för sig med
+     80 ms emellan. Hela sekvensen är klar på ~640 ms.
+     ========================================================================== */
+  @media (max-width: 820px) {
+    .steps.is-armed .step {
+      --d-node: calc(var(--i) * 80ms);
+      --d-title: calc(60ms + var(--i) * 80ms);
+      --d-text: calc(120ms + var(--i) * 80ms);
+    }
+  }
+
+  /* ==========================================================================
+     REDUCERAD RÖRELSE — ingen rörelse alls, allt synligt direkt.
+     Scriptet armar aldrig vid reduce; reglerna ligger kvar som spärr ifall
+     klasserna sätts på annat sätt.
+     ========================================================================== */
+  @media (prefers-reduced-motion: reduce) {
+    section.is-armed .process-head,
+    .steps.is-armed::before,
+    .steps.is-armed .step .node,
+    .steps.is-armed .step h3,
+    .steps.is-armed .step p,
+    .steps.is-armed .step .node::after {
+      opacity: 1;
+      transform: none;
+      clip-path: none;
+      transition: none;
+      animation: none;
+    }
+    .steps.is-armed .step .node {
+      background-color: var(--paper-2);
+      border-color: var(--gold);
+      color: var(--blue);
+    }
+    .steps.is-armed .step .node::after {
+      opacity: 0;
+    }
+  }
+</style>

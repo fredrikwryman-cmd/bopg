@@ -1,29 +1,33 @@
 ---
 // VÅRA BOLAG — startsidans gruppsektion.
 //
-// BYGGD SOM .astro, INTE SOM REACT-Ö MED FRAMER MOTION. Direktivet föreslog
-// Framer Motion, men whileInView kräver initial={{ opacity: 0 }}, och det
-// serverrenderar `style="opacity:0"` rakt in i HTML:en. Det är exakt felet som
-// redan finns på sajten (22 element osynliga utan JS) och som direktivet i
-// samma andetag pekar ut som kritiskt att undvika. Mönstret här är i stället
-// samma som BrandVideo.astro: ren markup + CSS som grundtillstånd, och ett
-// litet script som lägger på rörelsen.
+// EDITORIAL LISTA, INTE KORT. Fyra bolag ska läsas som fyra delar av EN grupp,
+// och då är en radlista rätt form: gemensamma hårfina linjer binder ihop dem,
+// medan fyra vita boxar delar upp dem i fyra separata objekt. All tyngd ligger
+// i typografi, luft och proportioner — ingen ram, ingen skugga, ingen fylld
+// yta.
 //
-// GRUNDTILLSTÅNDET ÄR SYNLIGT. Korten har full opacity i CSS. Först när
+// BYGGD SOM .astro, INTE SOM REACT-Ö MED FRAMER MOTION. whileInView kräver
+// initial={{ opacity: 0 }}, och det serverrenderar `style="opacity:0"` rakt in
+// i HTML:en — samma fel som redan finns på sajten (22 element osynliga utan
+// JS). Mönstret här är i stället samma som BrandVideo.astro: ren markup + CSS
+// som grundtillstånd, och ett litet script som lägger på rörelsen.
+//
+// GRUNDTILLSTÅNDET ÄR SYNLIGT. Raderna har full opacity i CSS. Först när
 // scriptet kört sätts klassen `is-js` på sektionen — och det är den klassen,
-// inte markupen, som döljer korten inför intoningen. Utan JS finns klassen
+// inte markupen, som döljer raderna inför intoningen. Utan JS finns klassen
 // aldrig, och sektionen ser helt normal ut.
 //
 // Scriptet ligger som inline-modul i samma fil och körs under parsningen, före
-// första målningen, så ingen blixt av synliga kort hinner visas.
+// första målningen, så ingen blixt av synliga rader hinner visas.
 
 import { company } from '../../data/company.js';
 const companies = [
   {
     name: 'AD Byggprojekt',
     text: 'Entreprenad — nybyggnation, renovering, totalentreprenad. Systerbolag till oss.',
-    // Sätt `url` här när adressen är permanent, så byts badgen automatiskt mot
-    // en riktig länk. Ingen strukturändring krävs.
+    // Sätt `url` här när adressen är permanent. Raden blir då en <a> som
+    // helhet och pilen tänds — ingen strukturändring krävs.
     url: null,
     badge: 'Länk tillkommer',
   },
@@ -49,8 +53,8 @@ const companies = [
 ---
 
 <section class="companies" id="bolag">
-  <!-- Dekorativt ordmärke bakom kortraden. Rent visuellt: den riktiga
-       rubriken är h2:an nedan, som alltid finns i DOM. -->
+  <!-- Dekorativt ordmärke bakom listan. Rent visuellt: den riktiga rubriken är
+       h2:an nedan, som alltid finns i DOM. -->
   <div class="companies-deco" aria-hidden="true">
     <span class="companies-deco-word">VÅRA BOLAG</span>
   </div>
@@ -63,21 +67,30 @@ const companies = [
       hela kedjan — från byggherrens första idé till färdig överlämning.
     </p>
 
-    <ul class="companies-grid">
-      {companies.map((c, i) => (
-        <li class="company-card" style={`--i:${i}`}>
-          <span class="company-idx mono">{String(i + 1).padStart(2, '0')}</span>
-          <h3 class="company-name">{c.name}</h3>
-          <p class="company-text">{c.text}</p>
-          {c.url ? (
-            <a class="company-link" href={c.url}>
-              Till sajten<span class="company-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-          ) : (
-            <span class="company-badge mono">{c.badge}</span>
-          )}
-        </li>
-      ))}
+    <ul class="companies-list">
+      {companies.map((c, i) => {
+        // Samma layout oavsett — bara elementet byts. Med url blir hela raden
+        // en länk; utan url är den ren text, och pilen tonas ned så att
+        // affordansen inte lovar något som inte finns.
+        const Tag = c.url ? 'a' : 'div';
+        const idx = String(i + 1).padStart(2, '0');
+        return (
+          <li class="company-item" style={`--i:${i}`}>
+            <Tag
+              class:list={['company-row', { 'is-pending': !c.url }]}
+              {...(c.url ? { href: c.url } : {})}
+            >
+              <span class="company-idx mono">{idx}</span>
+              <h3 class="company-name">{c.name}</h3>
+              <span class="company-arrow" aria-hidden="true">&rarr;</span>
+              <span class="company-meta">
+                <span class="company-text">{c.text}</span>
+                <span class="company-status mono">{c.url ? 'Till sajten' : c.badge}</span>
+              </span>
+            </Tag>
+          </li>
+        );
+      })}
     </ul>
   </div>
 </section>
@@ -91,9 +104,9 @@ const companies = [
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (!reduced) {
-      // Klassen som slår om korten till dolt starttillstånd. Sätts synkront
+      // Klassen som slår om raderna till dolt starttillstånd. Sätts synkront
       // under parsningen, alltså före första målningen — därför hinner inga
-      // synliga kort blinka förbi.
+      // synliga rader blinka förbi.
       section.classList.add('is-js');
 
       const reveal = () => section.classList.add('is-in');
@@ -108,10 +121,7 @@ const companies = [
             });
           },
           // threshold mäts mot sektionens EGEN höjd, inte mot skärmen. Ett
-          // ratio-värde (t.ex. 0.12) blir därför olika mycket scrollning på
-          // olika skärmar: på mobil staplas korten och sektionen blir dryga
-          // 1300 px hög, så 12 % motsvarar ~156 px in i sektionen — korten
-          // hinner synas innan intoningen startar och poppar till.
+          // ratio-värde blir därför olika mycket scrollning på olika skärmar.
           // threshold 0 + negativ nedre rootMargin utlöser i stället när
           // sektionens överkant passerat 12 % upp i vyn, vilket är samma
           // upplevelse oavsett sektionshöjd och skärmstorlek.
@@ -120,12 +130,12 @@ const companies = [
         io.observe(section);
       } else {
         // Utan IntersectionObserver: visa direkt hellre än att riskera att
-        // korten aldrig tonar in.
+        // raderna aldrig tonar in.
         reveal();
       }
 
       // Parallax på det dekorativa ordmärket. Håller sig medvetet inom
-      // ±PARALLAX px — tillräckligt för att ordet ska halka efter kortraden,
+      // ±PARALLAX px — tillräckligt för att ordet ska halka efter listan,
       // för lite för att kännas som en effekt i sig.
       const deco = section.querySelector('.companies-deco-word');
 
@@ -188,8 +198,11 @@ const companies = [
     font-size: clamp(4rem, 15vw, 13rem);
     line-height: 1;
     /* Svag ton mot papper — ska kännas som en tryckt skugga i pappret, inte
-       som text man försöker läsa. */
-    color: rgba(34, 42, 51, 0.055);
+       som text man försöker läsa. Sänkt från 0.055 i kortversionen: korten
+       hade en egen vit yta som skärmade av ordet, medan listans text nu
+       ligger direkt ovanpå det. Kontrollerat i vy — vid 0.055 skar ordets
+       kanter genom brödtexten på rad 02. */
+    color: rgba(34, 42, 51, 0.03);
     will-change: transform;
   }
 
@@ -199,109 +212,133 @@ const companies = [
     z-index: 1;
   }
 
-  .companies-grid {
+  /* ---------- bolagslistan ----------
+     Hårfina linjer, ingen fylld yta. En linje ovanför varje rad plus en
+     avslutande under den sista ger en sammanhållen uppställning snarare än
+     fyra fristående objekt. */
+  .companies-list {
     list-style: none;
-    margin-top: clamp(2.2rem, 4vw, 3.2rem);
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(1rem, 2vw, 1.6rem);
+    margin-top: clamp(2.4rem, 4.5vw, 3.6rem);
+    border-block-end: 1px solid var(--line);
   }
 
-  .company-card {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.7rem;
-    padding: clamp(1.5rem, 2.6vw, 2.2rem);
-    background: rgba(255, 255, 255, 0.72);
-    border: 1px solid var(--line);
-    border-radius: 5px;
-    backdrop-filter: blur(2px);
-    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  .company-row {
+    display: grid;
+    grid-template-columns: clamp(3rem, 5.5vw, 5rem) minmax(0, 1fr) auto;
+    grid-template-areas:
+      'idx name arrow'
+      '.   meta meta';
+    align-items: start;
+    column-gap: clamp(0.7rem, 1.8vw, 1.5rem);
+    row-gap: clamp(0.55rem, 1.1vw, 0.85rem);
+    padding-block: clamp(1.9rem, 3.4vw, 3rem);
+    border-block-start: 1px solid var(--line);
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .company-card::before {
-    /* Guldmarkering i överkant — samma språk som .ba-label och .sd-inc. */
-    content: '';
-    position: absolute;
-    top: -1px;
-    left: -1px;
-    width: 46px;
-    height: 3px;
-    background: var(--gold);
-    border-radius: 5px 0 0 0;
+  .company-row:hover {
+    border-block-start-color: rgba(34, 42, 51, 0.26);
   }
-  .company-card:hover {
-    border-color: rgba(34, 42, 51, 0.28);
-    box-shadow: 0 26px 54px -34px rgba(34, 42, 51, 0.5);
+  .company-row:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 4px;
   }
 
   .company-idx {
+    grid-area: idx;
     font-size: 0.72rem;
     letter-spacing: 0.22em;
     color: var(--blue);
+    /* Optisk linjering mot versalhöjden i bolagsnamnet bredvid. */
+    padding-top: 0.5em;
+    transition: color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
+  .company-row:hover .company-idx {
+    color: var(--gold);
+  }
+
   .company-name {
+    grid-area: name;
     font-family: 'Archivo', sans-serif;
     font-weight: 900;
-    font-size: clamp(1.35rem, 2.2vw, 1.85rem);
+    /* Medvetet under .sec-h (clamp(2.2rem, 4.5vw, 3.4rem)) — sektionens
+       rubrik ska förbli sidans röst, bolagsnamnen raden under den. */
+    font-size: clamp(1.55rem, 3.4vw, 2.7rem);
     text-transform: uppercase;
-    letter-spacing: -0.005em;
+    letter-spacing: -0.012em;
+    line-height: 1.02;
     color: var(--ink);
-    line-height: 1.05;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .company-row:hover .company-name {
+    transform: translateX(5px);
+  }
+
+  .company-arrow {
+    grid-area: arrow;
+    align-self: center;
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    line-height: 1;
+    color: var(--blue);
+    transition:
+      transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .company-row:hover .company-arrow {
+    transform: translateX(6px);
+  }
+  /* Utan adress är raden ingen länk. Pilen finns kvar som riktningsmarkör i
+     listan men tonas ned, och pekaren lovar ingenting. */
+  .company-row.is-pending {
+    cursor: default;
+  }
+  .company-row.is-pending .company-arrow {
+    color: var(--muted);
+    opacity: 0.42;
+  }
+  .company-row.is-pending:hover .company-arrow {
+    opacity: 0.6;
+  }
+
+  .company-meta {
+    grid-area: meta;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+    max-width: 34rem;
   }
   .company-text {
     font-size: 0.98rem;
     line-height: 1.65;
     color: var(--slate);
-    max-width: 30rem;
   }
-
-  .company-badge {
-    margin-top: 0.35rem;
+  .company-status {
     font-size: 0.68rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--muted);
-    border: 1px dashed rgba(34, 42, 51, 0.28);
-    border-radius: 2px;
-    padding: 0.34rem 0.7rem;
   }
-  .company-link {
-    margin-top: 0.35rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.72rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+  .company-row:not(.is-pending) .company-status {
     color: var(--blue);
-    border-bottom: 1px solid currentColor;
-    padding-bottom: 0.15rem;
-  }
-  .company-link .company-arrow {
-    transition: transform 0.25s ease;
-  }
-  .company-link:hover .company-arrow {
-    transform: translateX(4px);
   }
 
   /* ---------- rörelse (endast med JS) ----------
      Grundtillståndet ovan är synligt. Först klassen .is-js — som bara ett
-     körande script kan sätta — döljer korten, och .is-in tonar in dem igen.
-     Utan JS finns ingen av klasserna och korten står kvar fullt synliga. */
-  .companies.is-js .company-card {
+     körande script kan sätta — döljer raderna, och .is-in tonar in dem igen.
+     Utan JS finns ingen av klasserna och raderna står kvar fullt synliga. */
+  .companies.is-js .company-item {
     opacity: 0;
-    transform: translateY(26px);
+    transform: translateY(22px);
   }
-  .companies.is-js.is-in .company-card {
+  .companies.is-js.is-in .company-item {
     opacity: 1;
     transform: none;
     transition:
       opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
       transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-    /* Staggad start: 90 ms mellan korten. --i sätts per kort i markupen. */
+    /* Staggad start: 90 ms mellan raderna. --i sätts per rad i markupen. */
     transition-delay: calc(var(--i) * 90ms);
   }
 
@@ -309,6 +346,23 @@ const companies = [
   @media (max-width: 860px) {
     .companies-deco-word {
       font-size: clamp(3.2rem, 17vw, 7rem);
+    }
+  }
+
+  /* Under 720 px ryms inte siffra, namn och pil på samma rad utan att namnet
+     pressas ihop. Siffran flyttas då upp på egen rad — samma visuella idé,
+     bara staplad. Fortfarande ingen box. */
+  @media (max-width: 720px) {
+    .company-row {
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        'idx  idx'
+        'name arrow'
+        'meta meta';
+      row-gap: 0.7rem;
+    }
+    .company-idx {
+      padding-top: 0;
     }
   }
 
@@ -320,12 +374,8 @@ const companies = [
   }
 
   @media (max-width: 560px) {
-    .companies-grid {
-      grid-template-columns: 1fr;
-    }
     /* Det dekorativa ordet ryms inte på mobil utan att bli grötigt bakom
-       korten — det tas bort helt i stället för att krympas till oläslighet.
-       Kortens stagger blir kvar. */
+       texten — det tas bort helt i stället för att krympas till oläslighet. */
     .companies-deco {
       display: none;
     }
@@ -333,15 +383,20 @@ const companies = [
 
   /* ---------- reducerad rörelse ----------
      Scriptet hoppar redan över både .is-js och parallaxen vid reduce, men
-     regeln ligger kvar som spärr ifall klassen sätts på annat sätt. */
+     reglerna ligger kvar som spärr ifall klassen sätts på annat sätt. Även
+     hover-rörelsen stängs av; färgskiftet räcker som återkoppling. */
   @media (prefers-reduced-motion: reduce) {
-    .companies.is-js .company-card {
+    .companies.is-js .company-item {
       opacity: 1;
       transform: none;
       transition: none;
     }
     .companies-deco-word {
       transform: none !important;
+    }
+    .company-row:hover .company-name,
+    .company-row:hover .company-arrow {
+      transform: none;
     }
   }
 </style>

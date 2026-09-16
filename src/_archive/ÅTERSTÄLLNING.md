@@ -24,8 +24,27 @@ CM-uppdrag (Construction Management). Innehåller:
 
 Bildmaterialet ligger kvar orört i `public/forevefter/` och `public/services/`.
 
+## brand-video/
+Den loopande 3D-logotypfilmen på startsidan, urkopplad när blocket gjordes om
+till en interaktiv bildlösning (`src/components/home/BrandLogo.astro`). Klippet
+vägde 2,1 MB och var sidans tyngsta resurs; de två PNG:erna som ersatte det
+väger 107 kB tillsammans.
+
+| Fil | Låg tidigare på |
+|---|---|
+| `BrandVideo.astro` | `src/components/home/BrandVideo.astro` |
+| `logo-3d-rotating.mp4` | `public/logo-3d-rotating.mp4` |
+| `logo-3d-rotating-poster.jpg` | `public/logo-3d-rotating-poster.jpg` |
+
+Mp4:an och postern flyttades ut ur `public/` så att de inte längre följer med i
+bygget. De ligger kvar här orörda.
+
 ## Återställa
 `git mv` tillbaka till sökvägen i tabellen, och lägg tillbaka:
 - importen + `<ServicesOverview client:visible />` / `<BeforeAfterSection client:visible />` i `src/pages/index.astro`
 - `{ label: 'Tjänster', href: BASE + 'tjanster' }` i `links` i `src/components/layout/Navbar.jsx`
 - tjänstekolumnen i `src/components/layout/Footer.jsx`
+- för `brand-video/`: flytta tillbaka filerna enligt tabellen och byt
+  `<BrandLogo />` mot `<BrandVideo />` i `src/pages/index.astro` (och importen
+  på rad 7). `public/logo-symbol.png` och `public/logo-wordmark.png` kan då tas
+  bort, liksom `gsap` ur `package.json` om inget annat använder det.

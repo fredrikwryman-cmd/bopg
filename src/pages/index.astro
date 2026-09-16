@@ -4,7 +4,7 @@ import { company } from '../data/company.js';
 import Navbar from '../components/layout/Navbar.jsx';
 import Footer from '../components/layout/Footer.jsx';
 import HeroSection from '../components/home/HeroSection.jsx';
-import BrandVideo from '../components/home/BrandVideo.astro';
+import BrandLogo from '../components/home/BrandLogo.astro';
 import CompaniesSection from '../components/home/CompaniesSection.astro';
 import ProcessSection from '../components/home/ProcessSection.astro';
 import AboutSection from '../components/home/AboutSection.jsx';
@@ -27,7 +27,7 @@ import ContactSection from '../components/contact/ContactSection.jsx';
         sekunder innan bilden hann målas — LCP-mätningen visade 91 % "render
         delay". client:idle låter webbläsaren måla först och hydrera sedan. */}
     <HeroSection client:idle />
-    <BrandVideo />
+    <BrandLogo />
     <CompaniesSection />
     <ProcessSection />
     <AboutSection client:visible />

@@ -1,0 +1,413 @@
+---
+// LOGOTYPBLOCKET — ersätter den tidigare loopande mp4:an (BrandVideo.astro,
+// numera i src/_archive/brand-video/).
+//
+// VARFÖR BILDER I STÄLLET FÖR VIDEO. Klippet vägde 2,1 MB, alltså startsidans
+// i särklass tyngsta resurs, och krävde en vinjettmask för att dölja både en
+// AI-vattenstämpel och videorutans rektangel. De två trimmade PNG:erna nedan
+// väger 107 kB tillsammans, har äkta alfakanal och kan animeras med transform
+// och opacity i stället för att spelas upp.
+//
+// BILDERNA. src/_archive-originalen ligger orörda på beställarens dator; filerna
+// i public/ är samma bilder trimmade från sin transparenta ram och skalade till
+// 640 px (symbolen) respektive 1680 px (ordmärket) — cirka 3x största
+// visningsbredd, alltså skarpt även på retina. width/height-attributen är
+// bildernas verkliga pixelmått, så webbläsaren kan reservera rätt yta innan de
+// laddats och inget hoppar till (CLS).
+//
+// GRUNDTILLSTÅNDET ÄR DEN FÄRDIGA LOGOTYPEN. Ingen opacity: 0 och ingen
+// clip-path ligger i markupen eller i CSS:ens grundregler — samma princip som
+// CompaniesSection och ProcessSection. Först när scriptet kört sätts klassen
+// `is-js` på sektionen, och det är den klassen som (1) gör spåret högt och
+// scenen sticky och (2) sätter animationens starttillstånd. Utan JS, och vid
+// prefers-reduced-motion, finns klassen aldrig: då är sektionen ett vanligt
+// block med logotypen färdigt framme.
+//
+// SÄKERHETSNÄT. Skulle scriptbundeln aldrig köra (nätverksfel) står sektionen
+// kvar i grundtillståndet, eftersom `is-js` sätts av samma script som animerar.
+const BASE = import.meta.env.BASE_URL;
+
+// Hela gruppen läses som EN logotyp. Alt-texten bärs av ordmärket — det är den
+// bild som innehåller text — medan symbolen är dekorativ och markeras som sådan,
+// så att skärmläsaren inte läser upp logotypen två gånger.
+const ALT = 'Bygg & Projekt Gruppen – bygg, projektledning och entreprenad';
+---
+
+<section class="brandlogo">
+  <div class="brandlogo-track">
+    <div class="brandlogo-stage">
+      <div class="brandlogo-group">
+        <div class="brandlogo-symbol-wrap">
+          <img
+            class="brandlogo-symbol"
+            src={BASE + 'logo-symbol.png'}
+            alt=""
+            aria-hidden="true"
+            width="640"
+            height="500"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="brandlogo-wordmark-wrap">
+          <img
+            class="brandlogo-wordmark"
+            src={BASE + 'logo-wordmark.png'}
+            alt={ALT}
+            width="1680"
+            height="178"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <!-- Ljusreflexen. mix-blend-mode: screen gör den osynlig mot den vita
+             bakgrunden (vitt på vitt förblir vitt) och synlig först där den
+             passerar logotypens mörka och blå ytor. -->
+        <span class="brandlogo-sheen" aria-hidden="true"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  const section = document.querySelector('.brandlogo');
+
+  if (section) {
+    const track = section.querySelector('.brandlogo-track');
+    const group = section.querySelector('.brandlogo-group');
+    const symbolWrap = section.querySelector('.brandlogo-symbol-wrap');
+    const symbol = section.querySelector('.brandlogo-symbol');
+    const wordmarkWrap = section.querySelector('.brandlogo-wordmark-wrap');
+    const wordmark = section.querySelector('.brandlogo-wordmark');
+    const sheen = section.querySelector('.brandlogo-sheen');
+
+    const reducedQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    // Vid minskad rörelse görs ingenting alls: ingen sticky-fas, ingen
+    // scrollanimation, ingen hover. Logotypen står färdig och stilla.
+    if (!reducedQuery.matches) {
+      gsap.registerPlugin(ScrollTrigger);
+
+      // Klassen slår om sektionen till animerat läge. Scriptet är en modul och
+      // körs alltså efter att HTML:en parsats — men blocket ligger under hero,
+      // utanför första vyn, så klassen är sedan länge satt när besökaren väl
+      // scrollat hit. Ingen blixt av färdig logotyp hinner synas.
+      section.classList.add('is-js');
+
+      /* ---------- 1. SCROLLAVSLÖJANDET ---------- */
+
+      // Spåret är 180vh högt och scenen 100vh sticky inuti det. Tidslinjen
+      // startar redan när spåret är på väg in i vyn (top bottom-=10%) och
+      // slutar när spårets underkant når vyns underkant — alltså exakt när
+      // scenen släpper. Symbolen är därmed uppe när sektionen låser sig, och
+      // ordmärket avslöjas färdigt under själva sticky-fasen.
+      //
+      // scrub: 0.6 betyder att rörelsen följer scrollpositionen men med drygt
+      // en halv sekunds eftersläpning, vilket tar bort ryckigheten från
+      // hjulets diskreta steg utan att koppla loss den från scrollen. Scrollar
+      // besökaren uppåt spelas allt baklänges av sig självt.
+      gsap.timeline({
+        scrollTrigger: {
+          trigger: track,
+          start: 'top bottom-=10%',
+          end: 'bottom bottom',
+          scrub: 0.6,
+        },
+      })
+        // y: 0 i BÅDA lägena är inte överflödigt. GSAP läser in elementets
+        // befintliga transform när tweenen byggs, och CSS-baslinjen nedan
+        // (translateY(10%)) tolkas då som y = 16 px. Utan ett uttryckligt y: 0
+        // ligger de pixlarna kvar som en konstant förskjutning även när
+        // yPercent nått 0, och symbolen hamnar för lågt i slutläget.
+        .fromTo(
+          symbolWrap,
+          { opacity: 0, y: 0, yPercent: 10, scale: 0.94 },
+          { opacity: 1, y: 0, yPercent: 0, scale: 1, duration: 0.35, ease: 'power2.out' },
+          0,
+        )
+        // Ordmärket sveps fram från vänster till höger. inset() med höger sida
+        // på 100 % döljer allt; den krymper till 0 % och texten skrivs fram.
+        .fromTo(
+          wordmarkWrap,
+          { clipPath: 'inset(0% 100% 0% 0%)' },
+          { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.4, ease: 'power2.inOut' },
+          0.38,
+        )
+        // Tom svans: sista femtedelen av spåret håller den färdiga logotypen
+        // stilla i låst läge innan sektionen släpper. Det är den pausen som gör
+        // att blocket känns avsiktligt och inte som en effekt på väg förbi.
+        .to({}, { duration: 0.22 });
+
+      // Bilderna är lazy-laddade. Måtten är låsta via width/height, så inget
+      // hoppar — men om något ändå ändrar sidans höjd efter att triggern mätts
+      // upp måste ScrollTrigger räkna om sina positioner.
+      window.addEventListener('load', () => ScrollTrigger.refresh());
+
+      /* ---------- 2. HOVERINTERAKTIONEN ---------- */
+
+      // Bara riktiga pekare. På touch finns ingen hover — där skulle effekten
+      // antingen aldrig utlösas eller fastna i påslaget läge efter en tryckning.
+      const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+
+      if (finePointer.matches) {
+        // MAXVÄRDEN. Lutningen är avsiktligt liten: 2,5 grader syns som djup,
+        // inte som en rörelse. Att symbolen får flytta sig dubbelt så långt som
+        // ordmärket (6 px mot 3 px) är hela poängen — skillnaden i utslag är
+        // det som läses som att symbolen ligger närmare betraktaren.
+        const MAX_TILT = 2.5;
+        const MAX_SYMBOL = 6;
+        const MAX_WORDMARK = 3;
+
+        // quickTo ger en förberedd tween per egenskap som bara får nya målvärden
+        // när pekaren rör sig. Interpolationen sköts av GSAP, så gruppen glider
+        // efter pekaren i stället för att sitta fastklistrad vid den.
+        const setTiltX = gsap.quickTo(group, 'rotationX', { duration: 0.6, ease: 'power3' });
+        const setTiltY = gsap.quickTo(group, 'rotationY', { duration: 0.6, ease: 'power3' });
+        const setSymbolX = gsap.quickTo(symbol, 'x', { duration: 0.7, ease: 'power3' });
+        const setSymbolY = gsap.quickTo(symbol, 'y', { duration: 0.7, ease: 'power3' });
+        const setWordX = gsap.quickTo(wordmark, 'x', { duration: 0.8, ease: 'power3' });
+        const setWordY = gsap.quickTo(wordmark, 'y', { duration: 0.8, ease: 'power3' });
+        // Reflexen centreras med xPercent/yPercent så att x/y nedan kan räknas
+        // som ren pixelförskjutning från gruppens mitt.
+        gsap.set(sheen, { xPercent: -50, yPercent: -50 });
+        const setSheenX = gsap.quickTo(sheen, 'x', { duration: 0.5, ease: 'power3' });
+        const setSheenY = gsap.quickTo(sheen, 'y', { duration: 0.5, ease: 'power3' });
+
+        const onMove = (event) => {
+          // Pennor och musar släpps in, fingrar inte — media queryn ovan kan
+          // vara sann på hybridenheter med både pekskärm och mus.
+          if (event.pointerType === 'touch') return;
+
+          const rect = group.getBoundingClientRect();
+          const offsetX = event.clientX - (rect.left + rect.width / 2);
+          const offsetY = event.clientY - (rect.top + rect.height / 2);
+
+          // Normaliserat till [-1, 1] mot gruppens halva bredd respektive höjd.
+          const normX = Math.max(-1, Math.min(1, offsetX / (rect.width / 2)));
+          const normY = Math.max(-1, Math.min(1, offsetY / (rect.height / 2)));
+
+          // Förskjutningen räknas som en vektor och normaliseras om den blir
+          // längre än 1. Utan det skulle ett hörn ge 6 px i båda led, alltså
+          // 8,5 px diagonalt — mer än takvärdet.
+          const length = Math.hypot(normX, normY);
+          const scale = length > 1 ? 1 / length : 1;
+          const dirX = normX * scale;
+          const dirY = normY * scale;
+
+          // TECKNEN ÄR INTE GODTYCKLIGA. Positiv rotationY vrider gruppens högra
+          // kant BORT från betraktaren, så för att kanten närmast pekaren ska
+          // komma emot den — logotypen lutar mot pekaren, inte ifrån — vänds
+          // rotationY. rotationX går åt andra hållet av samma skäl: CSS y-axel
+          // pekar nedåt, så positiv vinkel är just den som lyfter underkanten
+          // fram mot betraktaren.
+          setTiltY(-normX * MAX_TILT);
+          setTiltX(normY * MAX_TILT);
+
+          setSymbolX(dirX * MAX_SYMBOL);
+          setSymbolY(dirY * MAX_SYMBOL);
+          setWordX(dirX * MAX_WORDMARK);
+          setWordY(dirY * MAX_WORDMARK);
+
+          setSheenX(offsetX);
+          setSheenY(offsetY);
+        };
+
+        const onEnter = (event) => {
+          if (event.pointerType === 'touch') return;
+          gsap.to(sheen, { opacity: 1, duration: 0.45, ease: 'power2.out' });
+        };
+
+        // Allt tillbaka till mitten i en enda mjuk rörelse. Samma duration på
+        // alla egenskaper, annars landar delarna vid olika tidpunkter och
+        // återgången ser sönderdelad ut.
+        const onLeave = () => {
+          gsap.to(group, { rotationX: 0, rotationY: 0, duration: 0.9, ease: 'power3.out' });
+          gsap.to([symbol, wordmark], { x: 0, y: 0, duration: 0.9, ease: 'power3.out' });
+          gsap.to(sheen, { opacity: 0, x: 0, y: 0, duration: 0.6, ease: 'power2.out' });
+        };
+
+        group.addEventListener('pointerenter', onEnter);
+        group.addEventListener('pointermove', onMove);
+        group.addEventListener('pointerleave', onLeave);
+      }
+    }
+  }
+</script>
+
+<style>
+  /* Ren vit bakgrund — medvetet ljusare än sajtens paper (#F7F5F1) både ovanför
+     (mörk hero) och nedanför (Våra bolag), så logotypen står i en egen tyst
+     yta. */
+  .brandlogo {
+    background: #fff;
+  }
+
+  /* GRUNDTILLSTÅND = FÄRDIG LOGOTYP, utan sticky och utan höga spår. Det här är
+     vad besökare utan JS och besökare med prefers-reduced-motion ser. */
+  .brandlogo-track {
+    position: relative;
+  }
+
+  .brandlogo-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(3.5rem, 8vw, 7rem) 1.5rem;
+    /* Perspektivet ligger på scenen, inte på gruppen: rotationen nedan ska
+       räknas från betraktarens position, inte från gruppens egen mitt. */
+    perspective: 900px;
+  }
+
+  .brandlogo-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: clamp(1.4rem, 3.2vw, 3.2rem);
+    transform-style: preserve-3d;
+  }
+
+  /* Måtten är satta mot mellanregistret, inte mot desktop. Med 15vw/40vw fick en
+     surfplatta på 820 px exakt samma logotypbredd som en telefon på 390 px —
+     328 px ordmärke i ett 820 px brett vitt fält, där underraden blev för liten
+     att läsa. Nu tar gruppen omkring två tredjedelar av bredden hela vägen från
+     760 px upp till 1240 px, där taken tar över. */
+  .brandlogo-symbol-wrap {
+    flex: 0 0 auto;
+    width: clamp(148px, 17vw, 208px);
+  }
+
+  .brandlogo-wordmark-wrap {
+    flex: 0 1 auto;
+    width: clamp(260px, 46vw, 560px);
+  }
+
+  /* height: auto tillsammans med width/height-attributen i markupen låser
+     bildernas proportioner. Ingenting förvrängs och ingen yta hoppar till. */
+  .brandlogo-symbol,
+  .brandlogo-wordmark {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .brandlogo-sheen {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 46%;
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 255, 255, 0.32),
+      rgba(255, 255, 255, 0) 68%
+    );
+    /* screen mot vit bakgrund = vitt, alltså ingen synlig ruta. Över symbolens
+       blå och ordmärkets marinblå lyfts tonen någon nyans — precis så mycket
+       att ögat läser det som ljus, inte som ett lager. */
+    mix-blend-mode: screen;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* ---------- ANIMERAT LÄGE (klassen sätts av scriptet) ---------- */
+
+  /* Spåret ger scrollsträckan, scenen står stilla i vyn medan den passerar.
+     100vh före 100svh: äldre webbläsare tar den första, nyare den andra, och
+     på mobil är svh den som inte hoppar när adressfältet fälls in. */
+  .brandlogo.is-js .brandlogo-track {
+    height: 180vh;
+  }
+
+  .brandlogo.is-js .brandlogo-stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  /* Animationens starttillstånd. Ligger i CSS och inte i markupen, så att det
+     bara existerar när scriptet faktiskt kört. GSAP skriver därefter egna
+     inline-värden som tar över. */
+  .brandlogo.is-js .brandlogo-symbol-wrap {
+    opacity: 0;
+    transform: translateY(10%) scale(0.94);
+  }
+
+  .brandlogo.is-js .brandlogo-wordmark-wrap {
+    clip-path: inset(0% 100% 0% 0%);
+  }
+
+  .brandlogo.is-js .brandlogo-group,
+  .brandlogo.is-js .brandlogo-symbol,
+  .brandlogo.is-js .brandlogo-wordmark,
+  .brandlogo.is-js .brandlogo-symbol-wrap,
+  .brandlogo.is-js .brandlogo-wordmark-wrap {
+    will-change: transform, opacity;
+  }
+
+  /* ---------- MOBIL / SURFPLATTA ---------- */
+
+  /* Under 760 px får symbolen och ordmärket inte plats bredvid varandra utan
+     att ordmärkets underrad ("BYGG · PROJEKTLEDNING · ENTREPRENAD") blir för
+     liten för att läsas. Staplat får båda delarna full bredd i stället. */
+  @media (max-width: 760px) {
+    .brandlogo-group {
+      flex-direction: column;
+      gap: clamp(1.1rem, 4vw, 1.8rem);
+    }
+
+    .brandlogo-symbol-wrap {
+      width: clamp(124px, 32vw, 176px);
+    }
+
+    .brandlogo-wordmark-wrap {
+      width: min(84vw, 430px);
+    }
+
+    /* Sticky-fasen kortas på små skärmar: en hel extra skärmhöjd att scrolla
+       förbi upplevs som mycket längre på mobil än på desktop. */
+    .brandlogo.is-js .brandlogo-track {
+      height: 150vh;
+    }
+
+    .brandlogo-sheen {
+      width: 62%;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .brandlogo-stage {
+      padding-left: 1.1rem;
+      padding-right: 1.1rem;
+    }
+  }
+
+  /* Dubbel spärr utöver JS-kontrollen: skulle klassen av något skäl ligga kvar
+     får den ingen effekt vid minskad rörelse. */
+  @media (prefers-reduced-motion: reduce) {
+    .brandlogo.is-js .brandlogo-track {
+      height: auto;
+    }
+
+    .brandlogo.is-js .brandlogo-stage {
+      position: static;
+      height: auto;
+      padding: clamp(3.5rem, 8vw, 7rem) 1.5rem;
+    }
+
+    .brandlogo.is-js .brandlogo-symbol-wrap {
+      opacity: 1;
+      transform: none;
+    }
+
+    .brandlogo.is-js .brandlogo-wordmark-wrap {
+      clip-path: none;
+    }
+  }
+</style>

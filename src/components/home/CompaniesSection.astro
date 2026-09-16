@@ -594,10 +594,27 @@ const total = String(companies.length).padStart(2, '0');
   .companies.is-enhanced .company-card:not(.is-active) .company-accent {
     opacity: 0.45;
   }
-  .companies.is-enhanced .company-accent {
+  /* Nedtonad brödtext i de panelerna. Det här handlar inte bara om viloläget,
+     utan om själva övergången: när den aktiva panelen glider upp exponeras den
+     undre panelens mitt under någon halvsekund, och med full textkontrast
+     konkurrerar de två uppsättningarna text om blicken. Nedtonad läses den
+     undre som "nästa", inte som en andra rubrik. Fortfarande fullt läsbar —
+     det är opacitet på redan mörk text mot ljus yta, inte grått på grått. */
+  .companies.is-enhanced .company-card:not(.is-active) .company-idx,
+  .companies.is-enhanced .company-card:not(.is-active) .company-text,
+  .companies.is-enhanced .company-card:not(.is-active) .company-status,
+  .companies.is-enhanced .company-card:not(.is-active) .company-arrow {
+    opacity: 0.55;
+  }
+  .companies.is-enhanced .company-accent,
+  .companies.is-enhanced .company-idx,
+  .companies.is-enhanced .company-text,
+  .companies.is-enhanced .company-status,
+  .companies.is-enhanced .company-name {
     transition:
       transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-      opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      color 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   /* ---------- responsivt ---------- */

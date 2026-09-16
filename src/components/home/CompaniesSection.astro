@@ -1,181 +1,275 @@
 ---
-// VÅRA BOLAG — startsidans gruppsektion.
+// VÅRA BOLAG — startsidans gruppsektion, byggd som en scrollstyrd bolagsstack.
 //
-// EDITORIAL LISTA, INTE KORT. Fyra bolag ska läsas som fyra delar av EN grupp,
-// och då är en radlista rätt form: gemensamma hårfina linjer binder ihop dem,
-// medan fyra vita boxar delar upp dem i fyra separata objekt. All tyngd ligger
-// i typografi, luft och proportioner — ingen ram, ingen skugga, ingen fylld
-// yta.
+// IDÉN. Gruppen ska läsas som ETT nav med fyra bolag runt sig, inte som fyra
+// fristående objekt. Vänsterspalten — etikett, rubrik, ingress och
+// progressindikator — står stilla medan bolagspanelerna växlar till höger.
+// Att avsändaren ligger kvar medan bolagen passerar är hela poängen: det är
+// gruppen som håller ihop dem.
 //
-// BYGGD SOM .astro, INTE SOM REACT-Ö MED FRAMER MOTION. whileInView kräver
-// initial={{ opacity: 0 }}, och det serverrenderar `style="opacity:0"` rakt in
-// i HTML:en — samma fel som redan finns på sajten (22 element osynliga utan
-// JS). Mönstret här är i stället samma som BrandLogo.astro: ren markup + CSS
-// som grundtillstånd, och ett litet script som lägger på rörelsen.
+// DATADRIVET. Allt som ska fyllas i senare ligger i `companies` nedan: nummer,
+// namn, beskrivning, status, href och accentfärg. När `href` får ett värde blir
+// hela panelen en riktig <a> som öppnas i samma flik, pilen tänds och pekaren
+// blir en hand. Med href: null renderas panelen som <div> — ingen tom länk,
+// ingen falsk affordans, och statusen står som text (inte som död knapp).
+// Layout och animation behöver inte röras.
 //
-// GRUNDTILLSTÅNDET ÄR SYNLIGT. Raderna har full opacity i CSS. Först när
-// scriptet kört sätts klassen `is-js` på sektionen — och det är den klassen,
-// inte markupen, som döljer raderna inför intoningen. Utan JS finns klassen
-// aldrig, och sektionen ser helt normal ut.
+// GRUNDTILLSTÅNDET ÄR EN VANLIG LISTA. Ingen opacity: 0 och ingen absolut
+// positionering finns i grund-CSS:en. Utan JavaScript, vid minskad rörelse, på
+// mobil och i korta fönster står alla fyra bolagen som en fullt läsbar vertikal
+// lista. Stacken existerar bara under klassen `is-enhanced`, som bara GSAP:s
+// matchMedia kan sätta. Samma princip som BrandLogo.astro och ProcessSection.
 //
-// Scriptet ligger som inline-modul i samma fil och körs under parsningen, före
-// första målningen, så ingen blixt av synliga rader hinner visas.
+// SCROLLSTÄLLNINGEN. Spåret är 300svh och scenen 100svh sticky inuti det. Två
+// saker är värda att veta om varför strukturen ser ut som den gör:
+//   1. Sektionen har ingen egen padding — den ligger på scenen. Därför är
+//      sektionens box exakt lika med spårets, och ScrollTriggerns
+//      `start: top top` / `end: bottom bottom` sammanfaller på pixeln med den
+//      sträcka scenen faktiskt sitter fast.
+//   2. `overflow: hidden` ligger på scenen, inte på sektionen. På sektionen
+//      hade den brutit position: sticky — ett element kan inte sitta fast mot
+//      en förfader som själv är en klippande scrollcontainer. Samma fälla som
+//      global.css varnar för på body.
 
 import { company } from '../../data/company.js';
+
 const companies = [
   {
+    number: '01',
     name: 'AD Byggprojekt',
-    text: 'Entreprenad — nybyggnation, renovering, totalentreprenad. Systerbolag till oss.',
-    // Sätt `url` här när adressen är permanent. Raden blir då en <a> som
-    // helhet och pilen tänds — ingen strukturändring krävs.
-    url: null,
-    badge: 'Länk tillkommer',
+    description: 'Entreprenad — nybyggnation, renovering och totalentreprenad.',
+    status: 'Länk tillkommer',
+    // Sätt adressen här när den är permanent. Inget annat behöver ändras.
+    href: null,
+    accent: 'gold',
   },
   {
+    number: '02',
     name: 'Bolag 02',
-    text: 'CM-uppdrag inom specialitet som ännu inte är fastställd.',
-    url: null,
-    badge: 'Sajt under uppbyggnad',
+    description: 'CM-uppdrag inom specialitet som ännu inte är fastställd.',
+    status: 'Sajt under uppbyggnad',
+    href: null,
+    accent: 'blue',
   },
   {
+    number: '03',
     name: 'Bolag 03',
-    text: 'CM-uppdrag inom specialitet som ännu inte är fastställd.',
-    url: null,
-    badge: 'Sajt under uppbyggnad',
+    description: 'CM-uppdrag inom specialitet som ännu inte är fastställd.',
+    status: 'Sajt under uppbyggnad',
+    href: null,
+    accent: 'blue',
   },
   {
+    number: '04',
     name: 'Bolag 04',
-    text: 'CM-uppdrag inom specialitet som ännu inte är fastställd.',
-    url: null,
-    badge: 'Sajt under uppbyggnad',
+    description: 'CM-uppdrag inom specialitet som ännu inte är fastställd.',
+    status: 'Sajt under uppbyggnad',
+    href: null,
+    accent: 'blue',
   },
 ];
+
+const total = String(companies.length).padStart(2, '0');
 ---
 
-<section class="companies" id="bolag">
-  <!-- Dekorativt ordmärke bakom listan. Rent visuellt: den riktiga rubriken är
-       h2:an nedan, som alltid finns i DOM. -->
-  <div class="companies-deco" aria-hidden="true">
-    <span class="companies-deco-word">VÅRA BOLAG</span>
-  </div>
+<section class="companies" id="bolag" data-companies-section>
+  <div class="companies-track">
+    <div class="companies-stage">
+      <!-- Dekorativt ordmärke bakom innehållet. Rent visuellt — den riktiga
+           rubriken är h2:an nedan, som alltid finns i DOM. -->
+      <div class="companies-deco" aria-hidden="true">
+        <span class="companies-deco-word">VÅRA BOLAG</span>
+      </div>
 
-  <div class="wrap companies-in">
-    <span class="sec-ey">Gruppen</span>
-    <h2 class="sec-h">Våra bolag</h2>
-    <p class="sec-intro">
-      {company.name} är navet i en grupp bolag som tillsammans täcker
-      hela kedjan — från byggherrens första idé till färdig överlämning.
-    </p>
+      <div class="wrap companies-grid">
+        <div class="companies-aside">
+          <span class="sec-ey">Gruppen</span>
+          <h2 class="sec-h">Våra bolag</h2>
+          <p class="sec-intro">
+            {company.name} är navet i en grupp bolag som tillsammans täcker
+            hela kedjan — från byggherrens första idé till färdig överlämning.
+          </p>
 
-    <ul class="companies-list">
-      {companies.map((c, i) => {
-        // Samma layout oavsett — bara elementet byts. Med url blir hela raden
-        // en länk; utan url är den ren text, och pilen tonas ned så att
-        // affordansen inte lovar något som inte finns.
-        const Tag = c.url ? 'a' : 'div';
-        const idx = String(i + 1).padStart(2, '0');
-        return (
-          <li class="company-item" style={`--i:${i}`}>
-            <Tag
-              class:list={['company-row', { 'is-pending': !c.url }]}
-              {...(c.url ? { href: c.url } : {})}
-            >
-              <span class="company-idx mono">{idx}</span>
-              <h3 class="company-name">{c.name}</h3>
-              <span class="company-arrow" aria-hidden="true">&rarr;</span>
-              <span class="company-meta">
-                <span class="company-text">{c.text}</span>
-                <span class="company-status mono">{c.url ? 'Till sajten' : c.badge}</span>
-              </span>
-            </Tag>
-          </li>
-        );
-      })}
-    </ul>
+          <!-- Progressindikatorn hör till stacken och visas bara när den är
+               påslagen. I listläget vore "01 / 04" meningslöst: alla fyra
+               bolagen står ju framme samtidigt. -->
+          <div class="companies-progress" aria-hidden="true">
+            <span class="companies-count mono">
+              <span class="companies-count-active" data-company-count>01</span>
+              <span class="companies-count-sep">/</span>
+              <span class="companies-count-total">{total}</span>
+            </span>
+            <span class="companies-bar">
+              <span class="companies-bar-fill"></span>
+            </span>
+            <span class="companies-hint mono">Scrolla</span>
+          </div>
+        </div>
+
+        <ul class="companies-stack">
+          {companies.map((c) => {
+            // Samma innehåll oavsett — bara elementet byts. Astro renderar
+            // `Tag` som <a> när adressen finns och som <div> när den saknas.
+            const Tag = c.href ? 'a' : 'div';
+            return (
+              <li
+                class:list={['company-card', `is-${c.accent}`, { 'is-link': !!c.href }]}
+                data-company-card
+              >
+                <Tag
+                  class:list={['company-panel', { 'is-pending': !c.href }]}
+                  {...(c.href ? { href: c.href } : {})}
+                >
+                  <span class="company-ghost" aria-hidden="true">{c.number}</span>
+                  <span class="company-idx mono">{c.number}</span>
+                  <h3 class="company-name">{c.name}</h3>
+                  <p class="company-text">{c.description}</p>
+                  <span class="company-foot">
+                    <span class="company-status mono">{c.href ? 'Till sajten' : c.status}</span>
+                    <span class="company-arrow" aria-hidden="true">&rarr;</span>
+                  </span>
+                  <span class="company-accent" aria-hidden="true"></span>
+                </Tag>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>
   </div>
 </section>
 
 <script>
-  // Progressiv förbättring. Allt här är tillägg — utan det här scriptet är
-  // sektionen fullt läsbar, bara utan rörelse.
-  const section = document.querySelector('.companies');
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-  if (section) {
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const section = document.querySelector('[data-companies-section]');
+  const cards = gsap.utils.toArray('[data-company-card]');
 
-    if (!reduced) {
-      // Klassen som slår om raderna till dolt starttillstånd. Sätts synkront
-      // under parsningen, alltså före första målningen — därför hinner inga
-      // synliga rader blinka förbi.
-      section.classList.add('is-js');
+  if (section && cards.length > 1) {
+    gsap.registerPlugin(ScrollTrigger);
 
-      const reveal = () => section.classList.add('is-in');
+    const countEl = section.querySelector('[data-company-count]');
+    const mm = gsap.matchMedia();
 
-      if ('IntersectionObserver' in window) {
-        const io = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((e) => {
-              if (!e.isIntersecting) return;
-              reveal();
-              io.disconnect();
+    mm.add(
+      {
+        // Tre villkor måste hålla samtidigt:
+        //   - minst 761 px brett: under det är listan rätt form och stacken
+        //     skulle tvinga fram onödig scrollsträcka på en telefon,
+        //   - minst 620 px högt: scenen är 100svh och måste rymma rubrikblock
+        //     och paneler utan att klippa dem i ett lågt fönster,
+        //   - ingen uttryckt önskan om minskad rörelse.
+        // Slår något av dem om vid en fönsterändring river matchMedia
+        // uppsättningen via cleanup-funktionen längst ned och sektionen faller
+        // tillbaka till exakt samma statiska lista som utan JavaScript.
+        desktop: '(min-width: 761px) and (min-height: 620px) and (prefers-reduced-motion: no-preference)',
+      },
+      ({ conditions }) => {
+        if (!conditions.desktop) return;
+
+        section.classList.add('is-enhanced');
+
+        // DVÄLJANDET. Utan det här hade panelerna rört sig konstant genom hela
+        // spåret, och ingen av dem hade fått stå still tillräckligt länge för
+        // att hinna läsas. Varje steg delas därför i två: första tredjedelen
+        // står panelen still, resten är övergången till nästa. smoothstep tar
+        // bort knycken i båda ändar av övergången.
+        const DWELL = 0.34;
+        const last = cards.length - 1;
+
+        const withDwell = (progress) => {
+          const raw = progress * last;
+          const step = Math.min(Math.floor(raw), last - 1);
+          const t = raw - step;
+          const moving = Math.min(1, Math.max(0, (t - DWELL) / (1 - DWELL)));
+          return step + moving * moving * (3 - 2 * moving);
+        };
+
+        const updateCards = (progress) => {
+          const position = withDwell(progress);
+          const activeIndex = Math.min(last, Math.max(0, Math.round(position)));
+
+          cards.forEach((card, index) => {
+            const distance = index - position;
+            const isPast = distance < 0;
+            const upcoming = Math.max(0, distance);
+
+            gsap.set(card, {
+              // Passerad panel glider upp och ut; kommande paneler ligger kvar
+              // en bit ned bakom den aktiva, högst tre djup in.
+              yPercent: isPast ? distance * 105 : Math.min(upcoming, 3) * 7,
+              scale: isPast
+                ? Math.max(0.94, 1 + distance * 0.035)
+                : 1 - Math.min(upcoming, 3) * 0.018,
+              // Först när panelen är nästan helt uppe ur vägen släcks den, så
+              // att den aldrig försvinner i ett hopp.
+              autoAlpha: distance < -0.9 ? 0 : 1,
+              zIndex: cards.length - index,
             });
-          },
-          // threshold mäts mot sektionens EGEN höjd, inte mot skärmen. Ett
-          // ratio-värde blir därför olika mycket scrollning på olika skärmar.
-          // threshold 0 + negativ nedre rootMargin utlöser i stället när
-          // sektionens överkant passerat 12 % upp i vyn, vilket är samma
-          // upplevelse oavsett sektionshöjd och skärmstorlek.
-          { rootMargin: '0px 0px -12% 0px', threshold: 0 },
-        );
-        io.observe(section);
-      } else {
-        // Utan IntersectionObserver: visa direkt hellre än att riskera att
-        // raderna aldrig tonar in.
-        reveal();
-      }
 
-      // Parallax på det dekorativa ordmärket. Håller sig medvetet inom
-      // ±PARALLAX px — tillräckligt för att ordet ska halka efter listan,
-      // för lite för att kännas som en effekt i sig.
-      const deco = section.querySelector('.companies-deco-word');
+            card.classList.toggle('is-active', index === activeIndex);
+          });
 
-      if (deco) {
-        const PARALLAX = 34;
-        let ticking = false;
-
-        const update = () => {
-          ticking = false;
-          const r = section.getBoundingClientRect();
-          const vh = window.innerHeight || document.documentElement.clientHeight;
-          // Utanför vy: rör ingenting, och spar arbete.
-          if (r.bottom < 0 || r.top > vh) return;
-          // progress: 0 när sektionens överkant möter nederkanten av vyn,
-          // 1 när sektionens underkant lämnat överkanten av vyn.
-          const progress = (vh - r.top) / (vh + r.height);
-          const offset = (progress - 0.5) * 2 * PARALLAX;
-          deco.style.transform = `translate3d(0, ${offset.toFixed(1)}px, 0)`;
+          const label = String(activeIndex + 1).padStart(2, '0');
+          section.style.setProperty('--active-company', label);
+          section.style.setProperty('--company-progress', String(progress));
+          if (countEl) countEl.textContent = label;
         };
 
-        const onScroll = () => {
-          if (ticking) return;
-          ticking = true;
-          requestAnimationFrame(update);
-        };
+        const trigger = ScrollTrigger.create({
+          trigger: section,
+          start: 'top top',
+          end: 'bottom bottom',
+          // scrub kopplar progressionen till scrollpositionen med drygt en halv
+          // sekunds eftersläpning. Rycker besökaren i hjulet hinner panelerna
+          // ifatt mjukt i stället för att hoppa, och scrollas det uppåt spelas
+          // allt baklänges av sig självt.
+          scrub: 0.7,
+          invalidateOnRefresh: true,
+          onUpdate: (self) => updateCards(self.progress),
+        });
 
-        update();
-        window.addEventListener('scroll', onScroll, { passive: true });
-        window.addEventListener('resize', onScroll, { passive: true });
-      }
-    }
+        updateCards(0);
+
+        // Cleanup körs när villkoren slutar gälla (fönsterändring, rotation,
+        // ändrad rörelseinställning). clearProps: 'all' plockar bort varenda
+        // inline-stil GSAP skrivit, så DOM:en står i samma läge som om
+        // scriptet aldrig kört.
+        return () => {
+          trigger.kill();
+          section.classList.remove('is-enhanced');
+          section.style.removeProperty('--active-company');
+          section.style.removeProperty('--company-progress');
+          if (countEl) countEl.textContent = '01';
+
+          cards.forEach((card) => {
+            card.classList.remove('is-active');
+            gsap.set(card, { clearProps: 'all' });
+          });
+        };
+      },
+    );
   }
 </script>
 
 <style>
+  /* ---------- sektionsskal ----------
+     Ingen padding här och ingen overflow: hidden — se filhuvudet. Sektionens
+     box måste vara exakt spårets, och en klippande förfader bryter sticky. */
   .companies {
+    position: relative;
+    background: var(--paper);
+  }
+
+  .companies-track {
+    position: relative;
+  }
+
+  .companies-stage {
     position: relative;
     overflow: hidden;
     padding: clamp(4.5rem, 9vw, 7rem) 2rem;
-    background: var(--paper);
   }
 
   /* ---------- dekorativt ordmärke ---------- */
@@ -187,7 +281,6 @@ const companies = [
     justify-content: center;
     pointer-events: none;
     user-select: none;
-    overflow: hidden;
   }
   .companies-deco-word {
     font-family: 'Archivo', sans-serif;
@@ -197,149 +290,314 @@ const companies = [
     white-space: nowrap;
     font-size: clamp(4rem, 15vw, 13rem);
     line-height: 1;
-    /* Svag ton mot papper — ska kännas som en tryckt skugga i pappret, inte
-       som text man försöker läsa. Sänkt från 0.055 i kortversionen: korten
-       hade en egen vit yta som skärmade av ordet, medan listans text nu
-       ligger direkt ovanpå det. Kontrollerat i vy — vid 0.055 skar ordets
-       kanter genom brödtexten på rad 02. */
-    color: rgba(34, 42, 51, 0.03);
-    will-change: transform;
+    /* Svag ton mot papper — en tryckt skugga i pappret, inte text man ska
+       försöka läsa. Ordet ligger under panelerna, som har egen fylld yta. */
+    color: rgba(34, 42, 51, 0.035);
   }
 
-  /* ---------- innehåll ---------- */
-  .companies-in {
+  /* ---------- rutnätet ---------- */
+  .companies-grid {
     position: relative;
     z-index: 1;
+    width: 100%;
   }
 
-  /* ---------- bolagslistan ----------
-     Hårfina linjer, ingen fylld yta. En linje ovanför varje rad plus en
-     avslutande under den sista ger en sammanhållen uppställning snarare än
-     fyra fristående objekt. */
-  .companies-list {
+  .companies-aside {
+    max-width: 34rem;
+  }
+
+  /* ---------- progressindikator ----------
+     Hör till stacken. I listläget finns ingen aktiv panel att räkna. */
+  .companies-progress {
+    display: none;
+  }
+
+  /* ---------- panelerna ---------- */
+  .companies-stack {
     list-style: none;
-    margin-top: clamp(2.4rem, 4.5vw, 3.6rem);
-    border-block-end: 1px solid var(--line);
+    margin-top: clamp(2.4rem, 4.5vw, 3.2rem);
+    display: grid;
+    gap: clamp(1rem, 2vw, 1.4rem);
   }
 
-  .company-row {
-    display: grid;
-    grid-template-columns: clamp(3rem, 5.5vw, 5rem) minmax(0, 1fr) auto;
-    grid-template-areas:
-      'idx name arrow'
-      '.   meta meta';
-    align-items: start;
-    column-gap: clamp(0.7rem, 1.8vw, 1.5rem);
-    row-gap: clamp(0.55rem, 1.1vw, 0.85rem);
-    padding-block: clamp(1.9rem, 3.4vw, 3rem);
-    border-block-start: 1px solid var(--line);
+  /* Accentfärgen sätts per bolag i datan och plockas upp av linjen, siffran
+     och pilen. Att byta 'blue' mot 'gold' i arrayen räcker. */
+  .company-card.is-gold {
+    --accent: var(--gold);
+  }
+  .company-card.is-blue {
+    --accent: var(--blue);
+  }
+
+  .company-panel {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    padding: clamp(1.5rem, 2.6vw, 2.2rem) clamp(1.5rem, 2.8vw, 2.4rem);
+    background: var(--white);
+    border: 1px solid var(--line);
     color: inherit;
     text-decoration: none;
-    transition: border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition:
+      transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .company-row:hover {
-    border-block-start-color: rgba(34, 42, 51, 0.26);
+  /* Handen visas bara när adressen finns. Placeholderpanelen ska inte lova
+     något den inte kan hålla. */
+  .company-panel.is-pending {
+    cursor: default;
   }
-  .company-row:focus-visible {
-    outline: 2px solid var(--blue);
-    outline-offset: 4px;
+  .company-panel:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 3px;
   }
 
+  /* Det stora numret bakom innehållet. Mycket svagt — en vattenstämpel, inte
+     en läsbar siffra. Det riktiga numret står som .company-idx ovanför. */
+  .company-ghost {
+    position: absolute;
+    top: -0.18em;
+    right: 0.1em;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 900;
+    font-size: clamp(5rem, 9vw, 8.5rem);
+    line-height: 1;
+    color: rgba(34, 42, 51, 0.045);
+    pointer-events: none;
+  }
+
+  /* position: relative på allt innehåll — spökssiffran är absolut positionerad
+     och skulle annars målas ovanpå den vanliga texten, som ligger i flödet. */
   .company-idx {
-    grid-area: idx;
+    position: relative;
+    display: block;
     font-size: 0.72rem;
     letter-spacing: 0.22em;
-    color: var(--blue);
-    /* Optisk linjering mot versalhöjden i bolagsnamnet bredvid. */
-    padding-top: 0.5em;
+    color: var(--accent);
     transition: color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .company-row:hover .company-idx {
-    color: var(--gold);
   }
 
   .company-name {
-    grid-area: name;
+    position: relative;
+    margin-top: 0.75rem;
     font-family: 'Archivo', sans-serif;
     font-weight: 900;
-    /* Medvetet under .sec-h (clamp(2.2rem, 4.5vw, 3.4rem)) — sektionens
-       rubrik ska förbli sidans röst, bolagsnamnen raden under den. */
-    font-size: clamp(1.55rem, 3.4vw, 2.7rem);
+    /* Medvetet under .sec-h — sektionens rubrik ska förbli sidans röst,
+       bolagsnamnen raden under den. */
+    font-size: clamp(1.4rem, 2.6vw, 2.15rem);
     text-transform: uppercase;
     letter-spacing: -0.012em;
-    line-height: 1.02;
+    line-height: 1.04;
     color: var(--ink);
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .company-row:hover .company-name {
-    transform: translateX(5px);
   }
 
-  .company-arrow {
-    grid-area: arrow;
-    align-self: center;
-    font-size: clamp(1.15rem, 2vw, 1.5rem);
-    line-height: 1;
-    color: var(--blue);
-    transition:
-      transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-      opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .company-row:hover .company-arrow {
-    transform: translateX(6px);
-  }
-  /* Utan adress är raden ingen länk. Pilen finns kvar som riktningsmarkör i
-     listan men tonas ned, och pekaren lovar ingenting. */
-  .company-row.is-pending {
-    cursor: default;
-  }
-  .company-row.is-pending .company-arrow {
-    color: var(--muted);
-    opacity: 0.42;
-  }
-  .company-row.is-pending:hover .company-arrow {
-    opacity: 0.6;
-  }
-
-  .company-meta {
-    grid-area: meta;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    align-items: flex-start;
-    max-width: 34rem;
-  }
   .company-text {
+    position: relative;
+    margin-top: 0.7rem;
+    max-width: 30rem;
     font-size: 0.98rem;
     line-height: 1.65;
     color: var(--slate);
   }
+
+  .company-foot {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: clamp(1rem, 2vw, 1.5rem);
+  }
+
   .company-status {
     font-size: 0.68rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--muted);
   }
-  .company-row:not(.is-pending) .company-status {
-    color: var(--blue);
+  .company-panel:not(.is-pending) .company-status {
+    color: var(--accent);
   }
 
-  /* ---------- rörelse (endast med JS) ----------
-     Grundtillståndet ovan är synligt. Först klassen .is-js — som bara ett
-     körande script kan sätta — döljer raderna, och .is-in tonar in dem igen.
-     Utan JS finns ingen av klasserna och raderna står kvar fullt synliga. */
-  .companies.is-js .company-item {
-    opacity: 0;
-    transform: translateY(22px);
-  }
-  .companies.is-js.is-in .company-item {
-    opacity: 1;
-    transform: none;
+  .company-arrow {
+    font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+    line-height: 1;
+    color: var(--accent);
     transition:
-      opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-    /* Staggad start: 90 ms mellan raderna. --i sätts per rad i markupen. */
-    transition-delay: calc(var(--i) * 90ms);
+      transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  /* Utan adress finns ingen destination. Pilen står kvar som riktningsmarkör
+     men nedtonad. */
+  .company-panel.is-pending .company-arrow {
+    color: var(--muted);
+    opacity: 0.4;
+  }
+
+  /* Accentlinjen längs panelens överkant. Växer på hover, men bara på paneler
+     som faktiskt går att klicka på. */
+  .company-accent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 3.4rem;
+    background: var(--accent);
+    transform-origin: left center;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* ---------- hover ----------
+     Rörelsen ligger på .company-panel, INTE på .company-card. Kortet är det
+     GSAP transformerar varje bildruta; en transform här hade skrivits över
+     direkt. Panelen inuti är fri. */
+  @media (hover: hover) and (pointer: fine) {
+    .company-card.is-link .company-panel:hover {
+      transform: translateY(-5px);
+      border-color: rgba(34, 42, 51, 0.3);
+      box-shadow: 0 22px 44px -30px rgba(34, 42, 51, 0.55);
+    }
+    .company-card.is-link .company-panel:hover .company-arrow {
+      transform: translateX(6px);
+    }
+    .company-card.is-link .company-panel:hover .company-accent {
+      transform: scaleX(1.55);
+    }
+    /* Placeholder: bara en aning tydligare kant. Ingen lyftning, ingen skugga
+       — inget som får den att kännas klickbar. */
+    .company-panel.is-pending:hover {
+      border-color: rgba(34, 42, 51, 0.22);
+    }
+    .company-panel.is-pending:hover .company-accent {
+      transform: scaleX(1.12);
+    }
+  }
+
+  /* ---------- rutnät från 761 px ----------
+     Gäller även utan JavaScript: vänsterspalten bredvid en vanlig vertikal
+     lista. Ingen överlappning, ingen absolut positionering. */
+  @media (min-width: 761px) {
+    .companies-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+      gap: clamp(2.2rem, 5vw, 5rem);
+      align-items: start;
+    }
+    .companies-stack {
+      margin-top: 0;
+    }
+  }
+
+  /* ---------- STACKLÄGET (klassen sätts av GSAP matchMedia) ---------- */
+
+  .companies.is-enhanced .companies-track {
+    /* 300svh: 100 för scenen plus 200 att scrolla igenom. Med fyra bolag ger
+       det ungefär två tredjedels skärmhöjd per bolag — nog för att hinna läsa,
+       för lite för att kännas som en utdragen tunnel. svh, inte vh, så att
+       måttet inte ändras när mobilens adressfält fälls in. */
+    height: 300vh;
+    height: 300svh;
+  }
+
+  .companies.is-enhanced .companies-stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    display: flex;
+    align-items: center;
+    padding-block: clamp(2rem, 5vh, 4rem);
+  }
+
+  .companies.is-enhanced .companies-grid {
+    align-items: center;
+  }
+
+  /* Ordmärket halkar efter innehållet medan stacken spelas — ±26 px, styrt av
+     samma progressvariabel som indikatorn. Utan variabeln (listläget) ger
+     var() sitt reservvärde och ordet står stilla. */
+  .companies.is-enhanced .companies-deco-word {
+    transform: translate3d(0, calc((var(--company-progress, 0.5) - 0.5) * 52px), 0);
+  }
+
+  .companies.is-enhanced .companies-progress {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: clamp(1.8rem, 3.5vw, 2.6rem);
+  }
+  .companies-count {
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    color: var(--ink);
+    display: inline-flex;
+    gap: 0.45em;
+  }
+  .companies-count-sep,
+  .companies-count-total {
+    color: var(--muted);
+  }
+  .companies-bar {
+    position: relative;
+    flex: 1 1 auto;
+    max-width: 10rem;
+    height: 1px;
+    background: var(--line);
+    overflow: hidden;
+  }
+  .companies-bar-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--gold);
+    transform-origin: left center;
+    /* Följer scrollen direkt. Ingen transition här — scrub sköter redan
+       utjämningen, och en transition ovanpå den hade bara laggat efter. */
+    transform: scaleX(var(--company-progress, 0));
+  }
+  .companies-hint {
+    font-size: 0.66rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Panelerna läggs i samma rutnätscell, alltså ovanpå varandra. Inget
+     absolut positionerat, ingen höjdräkning: stacken blir exakt så hög som
+     den högsta panelen. */
+  .companies.is-enhanced .companies-stack {
+    display: grid;
+    gap: 0;
+  }
+  .companies.is-enhanced .company-card {
+    grid-area: 1 / 1;
+    /* GSAP skriver transform varje bildruta; transformen ska räknas från
+       panelens överkant så att en passerad panel glider rakt upp. */
+    transform-origin: 50% 0%;
+    will-change: transform, opacity;
+  }
+
+  /* Bakomliggande paneler: läsbara men nedtonade. Den aktiva får vit yta,
+     tydligare kant och en mjuk skugga som lyfter den ur stapeln. */
+  .companies.is-enhanced .company-panel {
+    background: var(--paper-2);
+    border-color: rgba(34, 42, 51, 0.1);
+  }
+  .companies.is-enhanced .company-card.is-active .company-panel {
+    background: var(--white);
+    border-color: rgba(34, 42, 51, 0.16);
+    box-shadow: 0 30px 60px -42px rgba(34, 42, 51, 0.6);
+  }
+  .companies.is-enhanced .company-card:not(.is-active) .company-name {
+    color: var(--slate);
+  }
+  .companies.is-enhanced .company-card:not(.is-active) .company-accent {
+    opacity: 0.45;
+  }
+  .companies.is-enhanced .company-accent {
+    transition:
+      transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   /* ---------- responsivt ---------- */
@@ -349,53 +607,50 @@ const companies = [
     }
   }
 
-  /* Under 720 px ryms inte siffra, namn och pil på samma rad utan att namnet
-     pressas ihop. Siffran flyttas då upp på egen rad — samma visuella idé,
-     bara staplad. Fortfarande ingen box. */
-  @media (max-width: 720px) {
-    .company-row {
-      grid-template-columns: minmax(0, 1fr) auto;
-      grid-template-areas:
-        'idx  idx'
-        'name arrow'
-        'meta meta';
-      row-gap: 0.7rem;
-    }
-    .company-idx {
-      padding-top: 0;
-    }
-  }
-
   @media (max-width: 600px) {
-    .companies {
+    .companies-stage {
       padding-left: 1.3rem;
       padding-right: 1.3rem;
     }
   }
 
   @media (max-width: 560px) {
-    /* Det dekorativa ordet ryms inte på mobil utan att bli grötigt bakom
-       texten — det tas bort helt i stället för att krympas till oläslighet. */
+    /* Ordet ryms inte på mobil utan att bli grötigt bakom texten — det tas
+       bort helt i stället för att krympas till oläslighet. */
     .companies-deco {
       display: none;
     }
   }
 
   /* ---------- reducerad rörelse ----------
-     Scriptet hoppar redan över både .is-js och parallaxen vid reduce, men
-     reglerna ligger kvar som spärr ifall klassen sätts på annat sätt. Även
-     hover-rörelsen stängs av; färgskiftet räcker som återkoppling. */
+     matchMedia armar aldrig stacken vid reduce, så det här är en spärr ifall
+     klassen skulle sättas på annat sätt: samma statiska lista som utan JS. */
   @media (prefers-reduced-motion: reduce) {
-    .companies.is-js .company-item {
-      opacity: 1;
-      transform: none;
-      transition: none;
+    .companies.is-enhanced .companies-track {
+      height: auto;
     }
-    .companies-deco-word {
+    .companies.is-enhanced .companies-stage {
+      position: static;
+      height: auto;
+      display: block;
+      padding-block: clamp(4.5rem, 9vw, 7rem);
+    }
+    .companies.is-enhanced .companies-stack {
+      gap: clamp(1rem, 2vw, 1.4rem);
+    }
+    .companies.is-enhanced .company-card {
+      grid-area: auto;
       transform: none !important;
+      opacity: 1 !important;
+      visibility: visible !important;
     }
-    .company-row:hover .company-name,
-    .company-row:hover .company-arrow {
+    .companies.is-enhanced .companies-progress {
+      display: none;
+    }
+    .companies.is-enhanced .companies-deco-word,
+    .company-panel:hover,
+    .company-panel:hover .company-arrow,
+    .company-panel:hover .company-accent {
       transform: none;
     }
   }

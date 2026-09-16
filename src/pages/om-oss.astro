@@ -1,30 +1,310 @@
 ---
+// OM OSS — en egen berättelse, inte en kopia av startsidan.
+//
+// Sidan bestod tidigare av startsidans AboutSection, startsidans ProcessSection
+// och startsidans ContactSection i följd. Den som klickade "Läs mer om oss"
+// fick alltså läsa samma tre stycken en gång till, ordagrant, och hade ingen
+// anledning att stanna. Nu är strukturen sidans egen: varför gruppen finns,
+// vad erfarenheten består av, hur vi arbetar och en väg vidare.
+//
+// INGA PÅHITTADE UPPGIFTER. Allt som står här är sådant som redan fanns i
+// projektets egna underlag: rollerna, erfarenheten, projektstorleken, orten och
+// bolagsfakta. Inga årtal, kunder, referensprojekt eller certifieringar har
+// lagts till — de hade behövt beläggas, och det kan sidan inte.
+//
+// INGA STOCKFOTON. Det finns inget porträtt och inget projektfoto i projektet,
+// och ett inköpt leende hade varit sämre än ingenting. Typografi, rutnät och
+// siffror får bära sidan i stället.
 import Layout from '../layouts/Layout.astro';
 import { company } from '../data/company.js';
 import Navbar from '../components/layout/Navbar.jsx';
 import Footer from '../components/layout/Footer.jsx';
 import PageHeader from '../components/pages/PageHeader.jsx';
-import AboutSection from '../components/home/AboutSection.jsx';
-import ProcessSection from '../components/home/ProcessSection.astro';
-import ContactSection from '../components/contact/ContactSection.jsx';
+
+const BASE = import.meta.env.BASE_URL;
+
+const erfarenhet = [
+  { fig: '30', unit: '+', label: 'Års erfarenhet från byggbranschen' },
+  { fig: '270', unit: ' MSEK', label: 'Största projektstorlek i ledande roll' },
+  { fig: '01', unit: null, label: 'Ansvarig kontakt genom hela projektet' },
+];
+
+const roller = [
+  'Hantverkare',
+  'Stomledare',
+  'Arbetsledare',
+  'Platschef',
+  'Byggledare',
+];
+
+const principer = [
+  {
+    n: '01',
+    title: 'Tydligt ansvar',
+    text: 'En ansvarig väg genom projektets olika delar. Du ska aldrig behöva ta reda på vem som äger en fråga.',
+  },
+  {
+    n: '02',
+    title: 'Ekonomisk kontroll',
+    text: 'Beslut ska bygga på tydliga underlag och transparenta kostnader — inte på uppskattningar som visar sig först i slutfakturan.',
+  },
+  {
+    n: '03',
+    title: 'Kvalitet hela vägen',
+    text: 'Kontroll, dokumentation och uppföljning är en del av leveransen, inte något som görs om det blir tid över.',
+  },
+];
 ---
 
 <Layout
   title={`Om oss | ${company.legalName}`}
-  description={`${company.name} är en samlad byggpartner i Stockholmsområdet med bas i Åkersberga. Bakom gruppen står Andreas Dahlgren med över 20 års erfarenhet.`}
+  description={`${company.name} samlar projektledning och specialistkompetens i en gemensam struktur. Bakom gruppen står Andreas Dahlgren med över 30 års erfarenhet från byggbranschen.`}
 >
   <Navbar client:idle />
   <main>
     <PageHeader
       client:load
-      eyebrow="Om gruppen"
-      title="En samlad byggpartner"
-      subtitle="Kvalitet, ordning och en rak, ärlig dialog — oavsett projektets storlek. Vi vill vara den enda kontakt du behöver."
+      eyebrow="Om Bygg och Projekt Gruppen"
+      title="Byggt på erfarenhet. Skapat för bättre samordning."
+      subtitle="Byggprojekt blir bättre när ansvar, kommunikation och beslut hålls samman. Därför samlar vi projektledning och specialistkompetens i en gemensam struktur."
       crumbs={[{ label: 'Om oss' }]}
     />
-    <AboutSection client:visible withLink={false} />
-    <ProcessSection />
-    <ContactSection client:visible subject="Ny förfrågan från byggoprojektgruppen.se (Om oss)" />
+
+    <!-- B. VARFÖR GRUPPEN FINNS -->
+    <section class="section">
+      <div class="wrap about-story">
+        <div class="story-side">
+          <span class="sec-ey">Varför gruppen finns</span>
+        </div>
+        <div class="story-main">
+          <h2 class="story-lead">
+            Beställaren ska ha en tydlig väg genom projektet — inte en karta över
+            vem som pratar med vem.
+          </h2>
+          <p>
+            I ett byggprojekt sitter kompetensen sällan på ett ställe. Det i sig är inget
+            problem. Problemet uppstår när varje del har sin egen kontaktväg, sitt eget
+            underlag och sin egen bild av vad som är bestämt — och när byggherren blir den
+            som får hålla ihop det.
+          </p>
+          <p>
+            {company.name} finns för att samla det ansvaret. Vi för samman rätt kompetens
+            för varje del av projektet och håller i helheten själva, utan att bygga in
+            onödiga mellanled mellan dig och de som utför arbetet. Du tecknar avtalen
+            direkt med entreprenörerna. Vi leder, samordnar och följer upp.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- C. ERFARENHET -->
+    <section class="section stone">
+      <div class="wrap">
+        <span class="sec-ey">Erfarenheten bakom</span>
+        <h2 class="sec-h">Från byggplats<br />till byggledning</h2>
+        <p class="sec-intro">
+          Bakom gruppen står {company.ceo.split(' ')[0]} Dahlgren. Erfarenheten är byggd
+          nedifrån och upp — och det är den vägen som gör att ledningen av ett projekt
+          utgår från hur arbetet faktiskt utförs.
+        </p>
+
+        <div class="exp">
+          <div class="exp-roles">
+            <span class="exp-label mono">Roller genom åren</span>
+            <ol class="role-list">
+              {roller.map((r, i) => (
+                <li class="role">
+                  <span class="role-idx mono">{String(i + 1).padStart(2, '0')}</span>
+                  <span class="role-name">{r}</span>
+                </li>
+              ))}
+            </ol>
+            <p class="exp-note">
+              Erfarenhet från både produktion och ledning — samma projekt sett från
+              två håll.
+            </p>
+          </div>
+
+          <div class="exp-stats">
+            <div class="stats">
+              {erfarenhet.map((s) => (
+                <div class="stat">
+                  <span class="stat-fig">
+                    {s.fig}{s.unit && <span class="u">{s.unit}</span>}
+                  </span>
+                  <span class="stat-label">{s.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- D. ARBETSPRINCIPER -->
+    <section class="section">
+      <div class="wrap">
+        <span class="sec-ey">Så arbetar vi</span>
+        <h2 class="sec-h">Tre principer</h2>
+
+        <ol class="principles">
+          {principer.map((p) => (
+            <li class="principle">
+              <span class="principle-idx mono">{p.n}</span>
+              <h3 class="principle-title">{p.title}</h3>
+              <p class="principle-text">{p.text}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <!-- E. CTA -->
+    <section class="cta-band">
+      <div class="cta-band-in">
+        <div>
+          <h2>Har du ett projekt framför dig?</h2>
+          <p>
+            Berätta kort vad du planerar, så tar vi nästa steg tillsammans. Vi svarar
+            på förfrågningar löpande.
+          </p>
+        </div>
+        <a class="btn btn-primary" href={BASE + 'kontakt'}>
+          <span class="fill"></span>
+          <span class="lbl">Berätta om projektet</span>
+          <span class="arrow">&rarr;</span>
+        </a>
+      </div>
+    </section>
   </main>
   <Footer />
 </Layout>
+
+<style>
+  /* ---------- B. asymmetrisk berättelse ----------
+     Etiketten står ensam i vänsterspalten och texten tar den breda. Rytmen är
+     medvetet obalanserad: en redaktionell sida ska inte se ut som ett formulär
+     med två lika stora fält. */
+  .about-story {
+    display: grid;
+    grid-template-columns: minmax(0, .28fr) minmax(0, .72fr);
+    gap: clamp(1.5rem, 4vw, 4rem);
+    align-items: start;
+  }
+  @media (max-width: 860px) {
+    .about-story { grid-template-columns: 1fr; gap: 1.2rem; }
+  }
+  .story-lead {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 900;
+    font-size: clamp(1.5rem, 2.9vw, 2.3rem);
+    line-height: 1.18;
+    letter-spacing: -.012em;
+    color: var(--ink);
+    max-width: 24ch;
+    margin-bottom: 1.8rem;
+  }
+  .story-main p {
+    font-size: 1.06rem;
+    line-height: 1.85;
+    color: var(--slate);
+    max-width: 38rem;
+    margin-bottom: 1.2rem;
+  }
+  .story-main p:last-child { margin-bottom: 0; }
+
+  /* ---------- C. erfarenhet ---------- */
+  .exp {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(2.2rem, 5vw, 4.5rem);
+    align-items: start;
+    margin-top: clamp(2.4rem, 4.5vw, 3.4rem);
+  }
+  @media (max-width: 860px) {
+    .exp { grid-template-columns: 1fr; gap: 2.4rem; }
+  }
+  .exp-label {
+    display: block;
+    font-size: .72rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+  .role-list {
+    list-style: none;
+    border-block-end: 1px solid var(--line);
+  }
+  .role {
+    display: flex;
+    align-items: baseline;
+    gap: clamp(.9rem, 2vw, 1.4rem);
+    padding-block: clamp(.7rem, 1.4vw, 1rem);
+    border-block-start: 1px solid var(--line);
+  }
+  .role-idx { font-size: .7rem; letter-spacing: .18em; color: var(--blue); }
+  .role-name {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 900;
+    font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+    text-transform: uppercase;
+    letter-spacing: -.01em;
+    color: var(--ink);
+  }
+  /* Rollerna är en väg, inte en lista med likvärdiga punkter: tyngden ökar
+     nedåt, precis som ansvaret gjorde. */
+  .role:nth-child(1) .role-name { color: var(--muted); }
+  .role:nth-child(2) .role-name { color: var(--slate); }
+  .exp-note {
+    margin-top: 1.2rem;
+    font-size: .98rem;
+    line-height: 1.7;
+    color: var(--slate);
+    max-width: 30rem;
+  }
+
+  /* ---------- D. principer ---------- */
+  .principles {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    margin-top: clamp(2.4rem, 4.5vw, 3.4rem);
+    border-block-start: 1px solid var(--line);
+  }
+  @media (max-width: 860px) {
+    .principles { grid-template-columns: 1fr; }
+  }
+  .principle {
+    padding: clamp(1.8rem, 3vw, 2.4rem) clamp(1.4rem, 2.4vw, 2rem) clamp(2rem, 3.4vw, 2.6rem);
+    border-block-end: 1px solid var(--line);
+    border-inline-start: 1px solid var(--line);
+  }
+  .principle:last-child { border-inline-end: 1px solid var(--line); }
+  @media (max-width: 860px) {
+    .principle { border-inline-end: 1px solid var(--line); padding-inline: clamp(1.2rem, 4vw, 1.8rem); }
+  }
+  .principle-idx {
+    display: block;
+    font-size: .72rem;
+    letter-spacing: .2em;
+    color: var(--gold);
+    margin-bottom: 1.2rem;
+  }
+  .principle-title {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 900;
+    font-size: clamp(1.15rem, 2vw, 1.4rem);
+    text-transform: uppercase;
+    letter-spacing: -.008em;
+    line-height: 1.12;
+    color: var(--ink);
+    margin-bottom: .8rem;
+  }
+  .principle-text {
+    font-size: .98rem;
+    line-height: 1.7;
+    color: var(--slate);
+  }
+</style>

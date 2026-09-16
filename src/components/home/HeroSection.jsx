@@ -3,15 +3,15 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 
 const BASE = import.meta.env.BASE_URL;
 
-// Banderollen listar gruppens bolag sedan BOPG lades om mot CM-uppdrag.
-// Tidigare låg sju enskilda hantverkstjänster här, vilket sa utförande
-// entreprenör — tvärtemot CM-rollen.
-// Korta poster med flit. .mq-item sätter text-transform: uppercase och
-// letter-spacing .16em, så beskrivande meningar blir väldigt breda och bara
-// drygt en post ryms på skärmen åt gången. Beskrivningarna bor i stället i
-// sektionen Våra bolag. Spårets bredd styr banderollens hastighet — se
-// kommentaren vid .mq-track i global.css.
-const ticker = ['AD Byggprojekt', 'Bolag 02 (snart)', 'Bolag 03 (snart)', 'Bolag 04 (snart)'];
+// Förtroenderaden längst ned i hero. Ersätter den rullande banderollen som låg
+// på exakt samma plats och listade gruppens bolag — den informationen har
+// numera en egen sektion, och tre fasta uppgifter säger mer på en halv sekund
+// än en marquee gör på trettio.
+const trust = [
+  { fore: null, stark: '30+', efter: 'års branscherfarenhet' },
+  { fore: 'Projekt upp till', stark: '270 MSEK', efter: null },
+  { fore: null, stark: null, efter: 'Stockholm · Åkersberga' },
+];
 
 export default function HeroSection() {
   const ref = useRef(null);
@@ -22,12 +22,11 @@ export default function HeroSection() {
 
   return (
     <header className="hero" id="top" ref={ref}>
-      {/* Sidans LCP-element. fetchPriority="high" flyttar upp bilden i webbläsarens
-          köordning (Lighthouse-revisionen "LCP request discovery" saknade just den),
-          och srcSet låter mobilen nöja sig med 800 px-varianten (47 kB) i stället för
-          1400 px (118 kB). Attributen ligger på motion.img — framer-motion skickar
-          okända props vidare till <img> orört, så parallaxen (y/scale) rörs inte.
-          Motsvarande <link rel="preload"> sätts i Layout.astro via index.astro. */}
+      {/* BILDEN ÄR ORÖRD. Samma fil, samma srcSet, samma object-fit och
+          object-position, samma parallax. Sidans LCP-element: fetchPriority
+          flyttar upp den i webbläsarens köordning och srcSet låter mobilen
+          nöja sig med 800 px-varianten. Attributen ligger på motion.img —
+          framer-motion skickar okända props vidare till <img> orört. */}
       <motion.img
         className="hero-bg"
         src={BASE + 'hero.jpg'}
@@ -41,49 +40,60 @@ export default function HeroSection() {
       />
       <div className="hero-scrim" />
       <div className="hero-grid" />
+
       <motion.div className="hero-in" style={{ opacity: copyOpacity }}>
         <div className="hero-copy">
-          <motion.span className="eyebrow" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.05 }}>
-            Åkersberga · Stockholm — samlad byggpartner
-          </motion.span>
+          {/* INTRORÖRELSEN LIGGER I CSS, INTE HÄR. Tidigare låg varje rad på en
+              motion-komponent med initial={{ opacity: 0 }}, vilket
+              serverrenderar style="opacity:0" rakt in i HTML:en — utan
+              JavaScript var hero-texten osynlig. Klassen .reveal är en ren
+              CSS-animation som spelas oavsett JavaScript och slutar i det
+              färdiga läget. --d staplar starten. */}
+          <span className="eyebrow reveal" style={{ '--d': '60ms' }}>
+            Bygg · Projektledning · Entreprenad
+          </span>
+
           <h1 className="headline">
-            <motion.span style={{ display: 'block' }} initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.18 }}>
-              Samlad byggpartner.
-            </motion.span>
-            <motion.span className="accent" style={{ display: 'block' }} initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.32 }}>
-              Från projektledning till färdig byggnad.
-              <svg className="sweep" viewBox="0 0 600 60" preserveAspectRatio="none" aria-hidden="true">
-                <path d="M8,42 C150,12 430,8 592,30" />
-              </svg>
-            </motion.span>
+            <span className="hl-line reveal" style={{ '--d': '160ms' }}>
+              <span className="accent">
+                En partner.
+                <svg className="sweep" viewBox="0 0 600 60" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M8,42 C150,12 430,8 592,30" />
+                </svg>
+              </span>
+            </span>
+            {/* Radbrytningen är satt för hand. "Hela vägen" hör ihop och ska
+                inte kunna hamna ensamt sist på raden ovanför. */}
+            <span className="hl-line reveal" style={{ '--d': '280ms' }}>
+              Hela vägen från idé<br />till färdig byggnad.
+            </span>
           </h1>
-          <motion.p className="sub" initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.4 }}>
-            Vi driver ditt byggprojekt som Construction Management-partner — rådgivare,
-            samordnare och projektledare genom hela kedjan. Du tecknar avtalen direkt med
-            entreprenörerna, vi håller i helheten.
-          </motion.p>
-          <motion.div className="actions" initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.46 }}>
-            {/* Pekade tidigare på /tjanster, som arkiverades i och med omläggningen
-                mot CM-uppdrag. Länken gick till en 404. Riktad om till den nya
-                bolagssektionen tills vidare — byt mål när CM-erbjudandet har en
-                egen sida. */}
-            <a className="btn btn-primary" href={BASE + '#bolag'}>
-              <span className="fill" /><span className="lbl">Våra bolag</span><span className="arrow">&rarr;</span>
+
+          <p className="sub reveal" style={{ '--d': '380ms' }}>
+            Vi leder, samordnar och kvalitetssäkrar byggprojekt genom hela kedjan —
+            med tydlig kostnadskontroll, raka beslutsvägar och en ansvarig kontakt.
+          </p>
+
+          <div className="actions reveal" style={{ '--d': '460ms' }}>
+            <a className="btn btn-primary" href={BASE + 'kontakt'}>
+              <span className="fill" />
+              <span className="lbl">Berätta om ditt projekt</span>
+              <span className="arrow">&rarr;</span>
             </a>
-            <a className="btn btn-ghost" href={BASE + 'kontakt'}>Kontakta oss</a>
-          </motion.div>
+            <a className="btn btn-ghost" href={BASE + '#bolag'}>Upptäck våra bolag</a>
+          </div>
         </div>
       </motion.div>
-      <div className="ticker">
-        <div className="marquee">
-          <div className="mq-track">
-            {[...ticker, ...ticker].map((t, i) => (
-              <span key={i} style={{ display: 'flex', alignItems: 'center' }}>
-                <span className={'mq-item' + (i % ticker.length === 0 ? ' first' : '')}>{t}</span>
-                <span className="mq-sep">&bull;</span>
-              </span>
-            ))}
-          </div>
+
+      <div className="hero-trust">
+        <div className="hero-trust-in">
+          {trust.map((t, i) => (
+            <span className="ht-item" key={i}>
+              {t.fore && <>{t.fore}&nbsp;</>}
+              {t.stark && <b>{t.stark}</b>}
+              {t.efter && <>&nbsp;{t.efter}</>}
+            </span>
+          ))}
         </div>
       </div>
     </header>

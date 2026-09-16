@@ -132,6 +132,10 @@ const jsonLd = {
     </style>
   </head>
   <body>
+    <!-- Sentinel för den fixerade headern. Ligger absolut positionerad i
+         dokumentets överkant och tar ingen plats i flödet. När den lämnar vyn
+         vet Navbar.jsx att sidan har scrollats, utan ett enda scroll-event. -->
+    <div data-header-sentinel aria-hidden="true"></div>
     <slot />
   </body>
 </html>

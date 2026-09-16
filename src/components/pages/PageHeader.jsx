@@ -1,7 +1,10 @@
-import { motion } from 'framer-motion';
-
 const BASE = import.meta.env.BASE_URL;
 
+// INGEN framer-motion HÄR LÄNGRE. Rubrikblocket låg tidigare på en motion.div
+// med initial={{ opacity: 0 }}, vilket serverrenderar style="opacity:0" rakt in
+// i HTML:en — utan JavaScript var sidhuvudet på om-oss, kontakt och
+// integritetspolicy tomt. Klassen .reveal är en ren CSS-animation som spelas
+// oavsett JavaScript och slutar i det färdiga läget.
 export default function PageHeader({ eyebrow, title, subtitle, crumbs }) {
   return (
     <header className="page-header">
@@ -18,15 +21,11 @@ export default function PageHeader({ eyebrow, title, subtitle, crumbs }) {
             ))}
           </nav>
         )}
-        <motion.div
-          initial={{ opacity: 0, y: 28 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        >
+        <div className="reveal">
           {eyebrow && <span className="eyebrow">{eyebrow}</span>}
           <h1>{title}</h1>
           {subtitle && <p className="ph-sub">{subtitle}</p>}
-        </motion.div>
+        </div>
       </div>
     </header>
   );

@@ -62,10 +62,13 @@ export default function HeroSection() {
                 </svg>
               </span>
             </span>
-            {/* Radbrytningen är satt för hand. "Hela vägen" hör ihop och ska
-                inte kunna hamna ensamt sist på raden ovanför. */}
+            {/* Radbrytningen är satt för hand för desktopbredd och stängs av
+                under 760 px, där raden ändå inte ryms. MELLANSLAGET FÖRE <br>
+                ÄR AVSIKTLIGT: utan det blir "idétill" ett enda ord när
+                brytningen döljs på mobil. På desktop trimmas det bort av
+                radbrytningen och syns inte. */}
             <span className="hl-line reveal" style={{ '--d': '280ms' }}>
-              Hela vägen från idé<br />till färdig byggnad.
+              Hela vägen från idé <br />till färdig byggnad.
             </span>
           </h1>
 

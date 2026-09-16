@@ -418,6 +418,12 @@ h1, h2, h3 { font-family: 'Archivo', sans-serif; line-height: 1; }
    sin rad, rakt genom versalerna på raden därunder — line-height .95 lämnar
    ingen plats åt det. */
 .hl-line + .hl-line { margin-top: .16em; }
+/* Den manuella radbrytningen i rubriken är satt för desktopbredd. På mobil
+   ryms inte "Hela vägen från idé" på en rad ändå, och brytningen lämnade då
+   "IDÉ" ensamt på en egen rad. Under 760 px får raden brytas där den vill. */
+@media (max-width: 760px) {
+  .headline br { display: none; }
+}
 .headline .accent { color: var(--blue); position: relative; display: inline-block; }
 .sweep { position: absolute; left: -2%; bottom: -.28em; width: 104%; height: .5em; overflow: visible; }
 .sweep path { fill: none; stroke: var(--gold); stroke-width: 9; stroke-linecap: round; stroke-dasharray: 1100; stroke-dashoffset: 1100; animation: draw 1.1s var(--ease) .65s forwards; }

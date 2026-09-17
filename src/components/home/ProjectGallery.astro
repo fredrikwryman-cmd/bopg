@@ -1,0 +1,87 @@
+---
+// PROJEKTGALLERI — fyra paneler under Våra bolag.
+//
+// PLATSHÅLLARE, INTE PROJEKT. Bilderna i public/projekt/ är ritade lokalt ur
+// sajtens egen palett: samma blueprint-rutnät som hero och sidhuvudena använder,
+// samma ink-, blue- och gold-toner, ett spöknummer i samma anda som
+// bolagskorten. Inga stockfoton och ingen extern bildtjänst — komponentens
+// exempel pekar på picsum.photos, och en enda sådan URL hade gjort
+// integritetspolicyn osann. Den räknar i dag upp exakt ett tredjepartsanrop
+// (OpenStreetMap på kontaktsidan), och den meningen ska fortsätta stämma.
+//
+// INGEN LÄNK. Projektsidor finns inte, så panelerna får inget `link`. Då
+// renderas de som <button> i stället för <a> — de öppnar en panel, de går
+// ingenstans. En länk till # hade varit ett löfte utan täckning.
+import AccordionGallery from '../AccordionGallery.jsx';
+
+const projekt = [
+  { image: '/projekt/projekt-01.png', label: 'Projekt 01' },
+  { image: '/projekt/projekt-02.png', label: 'Projekt 02' },
+  { image: '/projekt/projekt-03.png', label: 'Projekt 03' },
+  { image: '/projekt/projekt-04.png', label: 'Projekt 04' },
+].map((p) => ({
+  ...p,
+  // Alt-texten säger vad bilden ÄR. Den påstår inte att det finns ett projekt
+  // att se — det gör det inte ännu.
+  alt: `${p.label} — platshållarbild`,
+}));
+---
+
+<section class="projects" id="projekt">
+  <div class="wrap">
+    <span class="sec-ey">Projekt</span>
+    <h2 class="sec-h">Ett urval på väg</h2>
+    <p class="sec-intro">
+      Galleriet fylls med genomförda projekt allteftersom. Panelerna nedan är
+      platshållare tills det finns bilder och underlag att visa.
+    </p>
+
+    <!-- grayscale av: komponenten avfärgar vilande paneler, men
+         platshållarna är redan ritade i sajtens palett och blev bara gråa av
+         det. Nedtoningen av de vilande panelerna sköts av overlayen i stället,
+         så blått förblir blått. -->
+    <div class="projects-stage">
+      <AccordionGallery
+        client:visible
+        items={projekt}
+        defaultIndex={0}
+        expandRatio={0.58}
+        gap={7}
+        radius={0}
+        height={520}
+        ariaLabel="Projektgalleri, fyra platshållare"
+        accentColor="var(--gold)"
+        overlayColor="var(--ink)"
+        textColor="var(--paper)"
+        grayscale={false}
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .projects {
+    /* Våra bolag slutar på paper. Den här sektionen tar paper-2 så att de två
+       skiljs åt utan en linje emellan. */
+    background: var(--paper-2);
+    padding: clamp(4.5rem, 9vw, 7rem) 2rem;
+  }
+
+  .projects-stage {
+    margin-top: clamp(2.4rem, 4.5vw, 3.2rem);
+  }
+
+  /* Panelerna är knappar. Sajtens fokusmarkering ska gälla även här — den
+     inbyggda box-shadow-ringen i komponenten syns dåligt mot en mörk panel. */
+  .projects-stage :global(.ag-panel:focus-visible) {
+    outline: 3px solid var(--blue);
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 600px) {
+    .projects {
+      padding-left: 1.3rem;
+      padding-right: 1.3rem;
+    }
+  }
+</style>

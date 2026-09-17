@@ -5,6 +5,7 @@ import Navbar from '../components/layout/Navbar.jsx';
 import Footer from '../components/layout/Footer.jsx';
 import HeroSection from '../components/home/HeroSection.jsx';
 import BrandLogo from '../components/home/BrandLogo.astro';
+import LogoStrip from '../components/home/LogoStrip.astro';
 import CompaniesSection from '../components/home/CompaniesSection.astro';
 import ProcessSection from '../components/home/ProcessSection.astro';
 import AboutSection from '../components/home/AboutSection.jsx';
@@ -28,6 +29,7 @@ import ContactSection from '../components/contact/ContactSection.jsx';
         delay". client:idle låter webbläsaren måla först och hydrera sedan. */}
     <HeroSection client:idle />
     <BrandLogo />
+    <LogoStrip />
     <CompaniesSection />
     <ProcessSection />
     <AboutSection client:visible />

@@ -1,0 +1,68 @@
+---
+// LOGOTYPSLINGAN — gruppens fem märken som en långsam marquee.
+//
+// PLATSEN. Ligger där den roterande 3D-logovideon låg: mellan varumärkesblocket
+// och Våra bolag. Videon (BrandVideo.astro plus mp4 och poster) arkiverades i
+// src/_archive/brand-video/ när blocket gjordes om till BrandLogo.astro — den
+// är alltså urkopplad sedan tidigare, inte raderad, och ÅTERSTÄLLNING.md
+// beskriver hur den tas tillbaka.
+//
+// BAKGRUNDEN ÄR REN VIT och fadeOutColor är satt till exakt samma #ffffff.
+// Toningen i kanterna är alltså osynlig som yta: det enda den gör är att låta
+// märkena tona bort i stället för att klippas tvärt mot sektionskanten. Byts
+// bakgrunden måste fadeOutColor följa med, annars syns två vita nyanser mot
+// varandra.
+//
+// MÄRKENA ÄR LEVERERADE SOM DE ÄR. Svarta enfärgade SVG:er i public/logos/,
+// oförändrade. De visas som <img>, alltså utan currentColor — filerna används
+// exakt som de kom.
+import LogoLoop from '../LogoLoop.jsx';
+
+// ORDNINGEN ÄR DIREKTIVETS: gruppen först, AD Byggprojekt därefter, sedan de
+// tre platshållarna.
+//
+// FILNAMNEN ÄR DÄREMOT RÄTTADE MOT INNEHÅLLET. Direktivet parade
+// bolag-05.svg med "Bygg och Projekt Gruppen" och bolag-02.svg med "Bolag 02",
+// men filerna säger tvärtom: bolag-02.svg ÄR gruppens märke och bolag-05.svg
+// läser "BOLAG 05". Kontrollerat genom att rendera varje fil, och leverantörens
+// egen README och alt-texter.txt bekräftar det. Alt-texten måste beskriva den
+// bild den sitter på — annars presenterar skärmläsaren en platshållare som
+// företagets egen logotyp.
+//
+// Ingen alt-text innehåller förkortningen BOPG.
+const logos = [
+  { src: '/logos/bolag-02.svg', alt: 'Bygg och Projekt Gruppen' },
+  { src: '/logos/bolag-01-ad.svg', alt: 'AD Byggprojekt' },
+  { src: '/logos/bolag-03.svg', alt: 'Bolag 03' },
+  { src: '/logos/bolag-04.svg', alt: 'Bolag 04' },
+  { src: '/logos/bolag-05.svg', alt: 'Bolag 05' },
+];
+---
+
+<section class="logostrip">
+  <LogoLoop
+    client:visible
+    logos={logos}
+    logoHeight={50}
+    gap={72}
+    speed={130}
+    direction="left"
+    fadeOut={true}
+    fadeOutColor="#ffffff"
+    ariaLabel="Bolagen i gruppen"
+  />
+</section>
+
+<style>
+  .logostrip {
+    /* Samma vita yta som varumärkesblocket ovanför, så de två läses som ett
+       sammanhängande stycke innan Våra bolag tar över med sitt papper. */
+    background: #fff;
+    padding: clamp(2.2rem, 5vw, 3.4rem) 0;
+  }
+
+  /* Höjden är låst av bildernas egen höjd (--logoloop-logoHeight: 50px), som
+     sätts som inline-variabel redan i serverrenderad HTML. Remsan har därför
+     exakt samma höjd före och efter att slingan startar — ingen förskjutning
+     när ön hydreras. */
+</style>

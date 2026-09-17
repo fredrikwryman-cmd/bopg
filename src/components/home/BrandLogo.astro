@@ -15,6 +15,12 @@
 // bildernas verkliga pixelmått, så webbläsaren kan reservera rätt yta innan de
 // laddats och inget hoppar till (CLS).
 //
+// KOREOGRAFIN. Symbolen tonas in underifrån, roterar därefter ett helt varv
+// med en skalpuls på vägen (1 -> 1.15 -> 1), och ordmärkets avtäckning griper
+// in 0.15 innan varvet är slut. Slutläget är stabilt: 360 grader och scale 1.
+// Allt ligger i samma ScrollTrigger-tidslinje, alltså scrollstyrt och
+// reversibelt — se kommentarerna vid tidslinjen nedan.
+//
 // GRUNDTILLSTÅNDET ÄR DEN FÄRDIGA LOGOTYPEN. Ingen opacity: 0 och ingen
 // clip-path ligger i markupen eller i CSS:ens grundregler — samma princip som
 // CompaniesSection och ProcessSection. Först när scriptet kört sätts klassen
@@ -128,13 +134,41 @@ const ALT = 'Bygg & Projekt Gruppen – bygg, projektledning och entreprenad';
           { opacity: 1, y: 0, yPercent: 0, scale: 1, duration: 0.35, ease: 'power2.out' },
           0,
         )
+        // VARVET. Animistas rotate-scale-up, men som en del av den scrollstyrda
+        // tidslinjen i stället för en fristående CSS-animation — annars hade den
+        // spelat på egen klocka, struntat i scrollpositionen och inte gått
+        // baklänges vid uppscroll.
+        //
+        // Rotationen ligger på SYMBOLENS omslag, inte på gruppen: omslaget
+        // innehåller bara byggnadssymbolen, så ordmärket kan aldrig följa med
+        // runt. Den ligger inte heller på <img> inuti, eftersom det elementet
+        // ägs av hovereffekten längre ned.
+        //
+        // ease: 'none' på rotationen är ett krav, inte en smaksak. Med en
+        // mjukande kurva hade vinkeln slutat följa scrollhjulet linjärt, och
+        // ett varv som "drar ifrån" och sedan bromsar känns som en animation
+        // som spelar upp sig själv snarare än något besökaren styr.
+        //
+        // Starten ligger på 0.35, alltså exakt där intoningen slutar på
+        // scale: 1. Skalpulsen nedan delar egenskap med intoningen, och två
+        // tweens som överlappar på samma egenskap hade dragit åt var sitt håll.
+        .to(symbolWrap, { rotation: 360, duration: 0.4, ease: 'none' }, 0.35)
+        // Skalpulsen: 1 -> 1.15 vid halva varvet -> 1 igen. Två tweens i stället
+        // för en keyframe-array, så att ut- och invägen kan ha var sin kurva och
+        // mötas mjukt i toppen.
+        .to(symbolWrap, { scale: 1.15, duration: 0.2, ease: 'sine.inOut' }, 0.35)
+        .to(symbolWrap, { scale: 1, duration: 0.2, ease: 'sine.inOut' }, 0.55)
         // Ordmärket sveps fram från vänster till höger. inset() med höger sida
         // på 100 % döljer allt; den krymper till 0 % och texten skrivs fram.
+        //
+        // Starten är flyttad från 0.38 till 0.60: varvet slutar på 0.75, så
+        // avtäckningen börjar 0.15 innan symbolen står stilla. Överlappet är
+        // med flit — de två rörelserna ska greppa i varandra, inte köa.
         .fromTo(
           wordmarkWrap,
           { clipPath: 'inset(0% 100% 0% 0%)' },
           { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.4, ease: 'power2.inOut' },
-          0.38,
+          0.6,
         )
         // Tom svans: sista femtedelen av spåret håller den färdiga logotypen
         // stilla i låst läge innan sektionen släpper. Det är den pausen som gör

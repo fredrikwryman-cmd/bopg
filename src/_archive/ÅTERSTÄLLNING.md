@@ -53,10 +53,15 @@ Kort 01 är redan färdigt: AD Byggprojekt Stockholm AB med kategori, fakta och
 länk till adbyggprojekt.se. Kort 02–04 väntar på namn, beskrivning och adress.
 Fälten `category` och `facts` är valfria — kort utan dem renderar som förut.
 
-Ankaret `#bolag` flyttade till logotypslingan (`LogoStrip.astro`) när sektionen
-kopplades ur, eftersom navbaren, footern och hero-knappen alla pekar dit. Tas
-sektionen tillbaka ska id:t flytta med den, och `id="bolag"` tas bort från
-slingan.
+Rubriktexten lever vidare: ögonbrynet "Gruppen", rubriken "Våra bolag" och
+ingressen om att gruppen är navet är hämtade ordagrant härifrån till
+`ProjectGallery.astro`, som numera renderar sektionen Våra bolag med
+dragspelspaneler i stället för den gamla kortstacken. Ändras texten på ett
+ställe ska den ändras på båda, annars glider de isär.
+
+Ankaret `#bolag` sitter på den sektionen. Tas kortstacken tillbaka ska id:t
+flytta dit, och `#bolag` lyftas ur `scroll-margin-top`-listan i `global.css` —
+kortstacken är en sticky scen som ska börja exakt vid sin egen överkant.
 
 ## Återställa
 `git mv` tillbaka till sökvägen i tabellen, och lägg tillbaka:

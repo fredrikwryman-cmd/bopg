@@ -783,11 +783,12 @@ a.citem:hover .ci { background: rgba(31,78,150,.14); }
    Den fixerade headern är ca 120 px hög och skulle annars lägga sig över
    rubriken på det avsnitt man just hoppat till.
 
-   #bolag ligger numera på logotypslingan, en vanlig sektion, och behöver
-   därför marginalen. Tidigare satt ankaret på bolagssektionens sticky scen,
-   som skulle börja exakt vid sin egen överkant — då hade en marginal skjutit
-   scenen nedåt i vyn. */
-#bolag, #projekt, #process, #kontakt, #om { scroll-margin-top: 7rem; }
+   #bolag sitter på sektionen Våra bolag, som är en vanlig sektion med rubrik
+   och därför behöver marginalen. (Den gamla bolagssektionen var en sticky scen
+   som skulle börja exakt vid sin egen överkant — där hade en marginal skjutit
+   scenen nedåt i vyn. Tas den tillbaka ur arkivet måste #bolag lyftas ur
+   listan igen.) */
+#bolag, #process, #kontakt, #om { scroll-margin-top: 7rem; }
 
 /* ---------- entré ----------
    Sajtens gemensamma introrörelse. CSS-animation, inte JS: den spelas även med

@@ -1,5 +1,15 @@
 ---
-// PROJEKTGALLERI — fyra paneler under Våra bolag.
+// VÅRA BOLAG — fyra paneler i ett dragspel.
+//
+// FILNAMNET SÄGER ProjectGallery, SEKTIONEN HETER VÅRA BOLAG. Komponenten
+// byggdes som ett projektgalleri och fick sedan bolagssektionens rubriker och
+// plats. Dragspelet, bilderna, färgerna och timingen är oförändrade — det är
+// bara texten ovanför och etiketterna på panelerna som är bolagens. Filen får
+// gärna döpas om, men det är en egen ändring; här är ingenting annat rört.
+//
+// RUBRIKTEXTEN ÄR HÄMTAD ORDAGRANT ur den arkiverade bolagssektionen
+// (src/_archive/bolagssektion/CompaniesSection.astro). Ändras den här ska den
+// ändras där också, annars glider de isär den dag sektionen tas tillbaka.
 //
 // PLATSHÅLLARE, INTE PROJEKT. Bilderna i public/projekt/ är ritade lokalt ur
 // sajtens egen palett: samma blueprint-rutnät som hero och sidhuvudena använder,
@@ -13,27 +23,33 @@
 // renderas de som <button> i stället för <a> — de öppnar en panel, de går
 // ingenstans. En länk till # hade varit ett löfte utan täckning.
 import AccordionGallery from '../AccordionGallery.jsx';
+import { company } from '../../data/company.js';
 
-const projekt = [
-  { image: '/projekt/projekt-01.png', label: 'Projekt 01' },
-  { image: '/projekt/projekt-02.png', label: 'Projekt 02' },
-  { image: '/projekt/projekt-03.png', label: 'Projekt 03' },
-  { image: '/projekt/projekt-04.png', label: 'Projekt 04' },
-].map((p) => ({
-  ...p,
-  // Alt-texten säger vad bilden ÄR. Den påstår inte att det finns ett projekt
-  // att se — det gör det inte ännu.
-  alt: `${p.label} — platshållarbild`,
+// FYRA PANELER, INTE FEM. Navet listar sig inte självt: Bygg och Projekt
+// Gruppen är avsändaren för hela sektionen och hör inte hemma som ett av
+// korten i den. Bilderna är oförändrade — samma fyra platshållare i sajtens
+// palett, bara namnen ovanpå är bolagens.
+const bolag = [
+  { image: '/projekt/projekt-01.png', label: 'AD Byggprojekt' },
+  { image: '/projekt/projekt-02.png', label: 'Bolag 02' },
+  { image: '/projekt/projekt-03.png', label: 'Bolag 03' },
+  { image: '/projekt/projekt-04.png', label: 'Bolag 04' },
+].map((b) => ({
+  ...b,
+  // Alt-texten säger vad bilden ÄR. Den påstår inte att det finns en logotyp
+  // eller ett projektfoto att se — bilden är en platshållare, och det gäller
+  // även för AD Byggprojekt.
+  alt: `${b.label} — platshållarbild`,
 }));
 ---
 
-<section class="projects" id="projekt">
+<section class="projects" id="bolag">
   <div class="wrap">
-    <span class="sec-ey">Projekt</span>
-    <h2 class="sec-h">Ett urval på väg</h2>
+    <span class="sec-ey">Gruppen</span>
+    <h2 class="sec-h">Våra bolag</h2>
     <p class="sec-intro">
-      Galleriet fylls med genomförda projekt allteftersom. Panelerna nedan är
-      platshållare tills det finns bilder och underlag att visa.
+      {company.name} är navet i en grupp bolag som tillsammans täcker
+      hela kedjan — från byggherrens första idé till färdig överlämning.
     </p>
 
     <!-- grayscale av: komponenten avfärgar vilande paneler, men
@@ -50,13 +66,13 @@ const projekt = [
     <div class="projects-stage">
       <AccordionGallery
         client:visible
-        items={projekt}
+        items={bolag}
         defaultIndex={0}
         expandRatio={0.58}
         gap={7}
         radius={0}
         height={520}
-        ariaLabel="Projektgalleri, fyra platshållare"
+        ariaLabel="Våra bolag, fyra paneler"
         accentColor="var(--gold)"
         overlayColor="var(--ink)"
         textColor="var(--paper)"

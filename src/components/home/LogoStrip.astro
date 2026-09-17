@@ -13,12 +13,10 @@
 // bakgrunden måste fadeOutColor följa med, annars syns två vita nyanser mot
 // varandra.
 //
-// ANKARET #bolag BOR HÄR NUMERA. Sektionen Våra bolag är arkiverad (se
-// src/_archive/bolagssektion/), och navbaren, footern och hero-knappen pekar
-// alla på /#bolag. Slingan visar gruppens fem märken och är därmed det som
-// finns kvar av "våra bolag" på sidan — länkarna får ett sant mål i stället
-// för att peka på ett ankare som inte finns. Kommer bolagssektionen tillbaka
-// ska id:t flytta med den.
+// INGET EGET ANKARE. Slingan bar #bolag under den period då sektionen Våra
+// bolag var urkopplad. Rubriken heter numera Våra bolag igen längre ned på
+// sidan, och ankaret hör hemma där — navbaren, footern och hero-knappen ska
+// landa på sektionen med rubriken, inte på bandet ovanför den.
 //
 // MÄRKENA ÄR LEVERERADE SOM DE ÄR. Svarta enfärgade SVG:er i public/logos/,
 // oförändrade. De visas som <img>, alltså utan currentColor — filerna används
@@ -46,7 +44,7 @@ const logos = [
 ];
 ---
 
-<section class="logostrip" id="bolag">
+<section class="logostrip">
   <LogoLoop
     client:visible
     logos={logos}

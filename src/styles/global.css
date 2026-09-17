@@ -68,28 +68,31 @@ h1, h2, h3 { font-family: 'Archivo', sans-serif; line-height: 1; }
 ::selection { background: var(--blue); color: #fff; }
 
 /* ---------- NAV ----------
-   Headern ligger fixed och ändrar bara SIN EGEN höjd när sidan scrollas. Inget
-   innehåll ligger i flödet under den (hero är helbleed, undersidorna har fast
-   padding-top), så komprimeringen kan inte flytta något på sidan — noll layout
-   shift. Tillståndet kommer från en sentinel + IntersectionObserver i
-   Navbar.jsx, inte från ett scroll-event. */
+   Headern ligger fixed och har en FAST höjd. Logotypen ändrar inte storlek vid
+   scroll och padding ändras inte heller — det enda som händer är att ytan får
+   en hårfin kant och en mycket diskret skugga. Inget innehåll ligger i flödet
+   under headern (hero är helbleed, undersidorna har fast padding-top), så
+   varken laddning eller scroll kan flytta något på sidan.
+
+   Tillståndet kommer från en sentinel i dokumentets överkant plus
+   IntersectionObserver i Navbar.jsx, inte från ett scroll-event. */
 .nav {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   z-index: 50;
-  background: rgba(247, 245, 241, .72);
-  backdrop-filter: blur(16px) saturate(1.15);
-  -webkit-backdrop-filter: blur(16px) saturate(1.15);
+  /* Ren vit yta. Logotypfilen har vit bakgrund, och exakt samma vitt på båda
+     håll är det som gör att ingen rektangel kan skymta runt bilden. Ingen
+     backdrop-filter längre: ytan är opak, så den hade bara kostat
+     kompositering utan att synas. */
+  background: #fff;
   border-bottom: 1px solid transparent;
   transition:
-    background var(--dur-hover) ease,
     border-color var(--dur-hover) ease,
     box-shadow var(--dur-hover) ease;
 }
 .nav.is-scrolled {
-  background: rgba(247, 245, 241, .88);
   border-bottom-color: var(--line);
   /* Medvetet nätt. En tung skugga under en ljus header läser som ett
      verktygsfält, inte som en byggkonsults sidhuvud. */
@@ -103,77 +106,32 @@ h1, h2, h3 { font-family: 'Archivo', sans-serif; line-height: 1; }
   align-items: center;
   justify-content: space-between;
   gap: 2rem;
-  transition: padding var(--dur-enter) var(--ease);
 }
-.nav.is-scrolled .nav-in { padding-top: .5rem; padding-bottom: .5rem; }
 
-.brand { display: flex; align-items: center; gap: .7rem; font-family: 'Archivo', sans-serif; flex-shrink: 0; }
-/* Logotypen är 172x138 px. Vid 68 px höjd (85 px bred) ger det 2.02x täthet,
-   alltså fortfarande skarpt på retinaskärmar. Negativ vänstermarginal låter
-   symbolen bläda in i .nav-in:s 2rem-padding så den hamnar närmare sidkanten.
-   Marginalen tas ur flödet, så ordmärket bredvid följer med åt vänster medan
-   menyn till höger står kvar (.nav-in är space-between). */
-.brand-logo {
-  height: 68px;
-  width: auto;
-  display: block;
+/* .brand är länken runt logotypen. Ingen text ligger kvar bredvid bilden —
+   hela lockupen, inklusive verksamhetsrad och ort, finns i filen. */
+.brand {
+  display: flex;
+  align-items: center;
   flex-shrink: 0;
-  margin-left: -16px;
-  transition: height var(--dur-enter) var(--ease);
+  /* Fokusmarkeringen ska följa bilden, inte en osynlig inline-box. */
+  line-height: 0;
+  border-radius: 2px;
 }
-/* I komprimerat läge tar headern mindre plats: symbolen krymper och undertexten
-   fälls in. Höjden animeras på bilden själv, inte via scale, så ordmärket
-   bredvid följer med utan att bli suddigt. */
-.nav.is-scrolled .brand-logo { height: 48px; }
-.nav.is-scrolled .brand b { font-size: 1.28rem; }
-.nav.is-scrolled .brand .tagline {
-  opacity: 0;
-  max-height: 0;
-  margin-top: 0;
-  overflow: hidden;
-}
-/* Versalerna låg tidigare i källsträngen. Orden kommer numera ur company.js i
-   normal skrivning, så versaliseringen görs här — då syns firmanamnets rätta
-   stavning i källan och i skärmläsare. */
-.brand b {
-  font-weight: 900;
-  letter-spacing: .02em;
-  font-size: 1.5rem;
-  color: var(--ink);
-  line-height: 1;
-  white-space: nowrap;
-  text-transform: uppercase;
-  transition: font-size var(--dur-enter) var(--ease);
-}
-.brand b .amp { color: var(--gold); }
-/* Varje del av namnet hålls ihop. På desktop gör .brand b:s nowrap detta redan,
-   på mobil är det den här regeln som gör jobbet. Resten av deklarationerna
-   nollställer .brand span nedan, som matchar ALLA span i ordmärket. Utan dem
-   ärvde namnet undertextens utseende. .amp lämnas orörd och behåller sitt guld. */
-.brand b .wm {
-  white-space: nowrap;
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-  letter-spacing: inherit;
-  color: inherit;
-  text-transform: inherit;
-  display: inline;
-  margin-top: 0;
-}
-.brand span {
-  font-family: 'Space Mono', monospace;
-  font-size: .72rem;
-  letter-spacing: .22em;
-  color: var(--muted);
+
+/* LOGOTYPENS STORLEK.
+   Bilden är 1440x288, alltså exakt 5:1. width + height: auto tillsammans med
+   width/height-attributen i markupen låser proportionerna: ingenting kan
+   deformeras och ingen yta hoppar till medan filen laddas.
+
+   Desktop: clamp(340px, 31vw, 470px) ger 68–94 px höjd, tillräckligt för att
+   även "STOCKHOLM · ÅKERSBERGA" ska vara läsbar. Uppmätt vid 1024 px, den
+   trängsta desktopbredden: logotyp 340 + meny 334 + knapp 137 plus mellanrum
+   = 875 px av 960 tillgängliga, alltså 85 px luft kvar. */
+.brand-logo {
   display: block;
-  margin-top: .28rem;
-  white-space: nowrap;
-  max-height: 2rem;
-  transition:
-    opacity var(--dur-hover) ease,
-    max-height var(--dur-enter) var(--ease),
-    margin-top var(--dur-enter) var(--ease);
+  width: clamp(340px, 31vw, 470px);
+  height: auto;
 }
 
 .nav-links { display: flex; gap: 2rem; align-items: center; }
@@ -225,6 +183,7 @@ h1, h2, h3 { font-family: 'Archivo', sans-serif; line-height: 1; }
   border: none;
   width: 44px;
   height: 44px;
+  flex: none;
   align-items: center;
   justify-content: center;
   padding: 0;
@@ -234,25 +193,22 @@ h1, h2, h3 { font-family: 'Archivo', sans-serif; line-height: 1; }
 @media (max-width: 900px) {
   .nav-links { display: none; }
   .nav-burger { display: inline-flex; }
+  /* Mellanregistret: menyn är hopfälld och logotypen får ta mer av bredden,
+     men inte så mycket att den möter hamburgaren. */
+  .brand-logo { width: clamp(260px, 38vw, 360px); }
 }
 
-/* MOBIL (<= 640 px). Ordmärket är brett och låg med nowrap i en smal container.
-   Firmanamnet klipptes mitt i ordet och sköt ut hamburgaren utanför skärmen.
-   Åtgärden, i prioritetsordning: undertexten bort, nedskalad typgrad, och
-   namnet får brytas på två rader mellan sina delar — aldrig inuti dem. */
+/* MOBIL (<= 640 px). Hela lockupen visas fortfarande — den skalas
+   proportionerligt, den delas aldrig upp och ingen textversion ersätter den.
+   Måtten är uppmätta, inte gissade: vid 320 px finns 292 px innanför .nav-in:s
+   padding. Hamburgaren tar 44 px plus 7 px mellanrum, så logotypen kan vara
+   högst 241 px bred. 66vw ger 211 px där och 256 px från 388 px och uppåt. */
 @media (max-width: 640px) {
-  .nav-in { padding-left: .85rem; padding-right: .85rem; gap: .45rem; min-height: 96px; }
-  .nav.is-scrolled .nav-in { min-height: 74px; }
-  /* INGEN min-width: 0 här. Med den krympte .brand under ordmärkets egen bredd
-     och texten rann ut under knappen till höger. */
-  .brand { flex-shrink: 1; gap: .35rem; }
-  .brand-logo { height: 44px; margin-left: -6px; }
-  .nav.is-scrolled .brand-logo { height: 36px; }
-  .brand b { white-space: normal; font-size: 1.0625rem; }
-  .nav.is-scrolled .brand b { font-size: 1rem; }
-  .brand .tagline { display: none; }
-  /* Knappen i headern tas bort på mobil — logotyp, namn, knapp OCH hamburgare
-     får inte plats på 360 px. Ingenting går förlorat: mobilpanelen har en egen
+  .nav-in { padding-left: .85rem; padding-right: .85rem; gap: .45rem; }
+  .brand { flex-shrink: 1; min-width: 0; }
+  .brand-logo { width: clamp(200px, 66vw, 256px); }
+  /* Knappen i headern tas bort på mobil — logotyp, knapp OCH hamburgare får
+     inte plats. Ingenting går förlorat: mobilpanelen har en egen
      Kontakta oss-knapp. */
   .nav-in > .nav-cta { display: none; }
 }

@@ -1,34 +1,37 @@
-// Ordmärke: transparent logo-symbol + textbaserat ordmärke (Archivo) med
-// guldfärgat &. Orden hämtas ur company.js så stavningen av firmanamnet bara
-// finns på ett ställe. Versalerna sätts av CSS (text-transform), inte i källan.
+// NAVBARENS LOGOTYP — en enda bild, inte ett återskapat ordmärke.
+//
+// Tidigare låg lockupen i tre delar: en symbolbild plus firmanamnet och
+// undertexten satta i HTML med Archivo och Space Mono. Den konstruktionen
+// kunde aldrig bli identisk med den riktiga logotypen — teckensnittens
+// proportioner, kerning och det guldfärgade &-tecknet var en approximation, och
+// de tre delarna kunde glida isär vid varje ny brytpunkt. Nu är det den levererade
+// logotypfilen som visas, som en sammanhållen enhet.
+//
+// BILDEN. public/bopg-navbar-logo.png är originalet (orört på beställarens
+// dator) trimmat från sin vita ytteryta och skalat till 1440 px bredd — drygt
+// 3x största visningsbredd, alltså skarpa bokstäver även på retina. Bakgrunden
+// är snappad till exakt #ffffff: originalet låg på 253–254, vilket hade synts
+// som en svag rektangel mot navbarens vita yta.
+//
+// TILLGÄNGLIGHET. Alt-texten är firmanamnet, en gång. Ingen dold textversion
+// av namnet, verksamhetsraden eller orten ligger kvar bredvid — skärmläsaren
+// ska inte läsa upp samma uppgifter två gånger.
 import { company } from '../../data/company.js';
 
 const BASE = import.meta.env.BASE_URL;
 
-export default function Logo({ tag = true }) {
+export default function Logo() {
   return (
-    <>
-      <img
-        className="brand-logo"
-        src={BASE + 'bopg-logo.png'}
-        alt=""
-        width="85"
-        height="68"
-        aria-hidden="true"
-      />
-      <div>
-        {/* Namnets två delar ligger i var sitt .wm-span. På mobil får ordmärket
-            radbrytas, och spannen ser då till att brytningen bara kan ske MELLAN
-            delarna — aldrig mitt i "Projekt Gruppen". Utan dem kollapsade
-            textkolumnen till sin minsta innehållsbredd och bröt ord för ord. */}
-        <b>
-          <span className="wm">
-            {company.wordmark[0]} <span className="amp">&amp;</span>
-          </span>{' '}
-          <span className="wm">{company.wordmark[1]}</span>
-        </b>
-        {tag && <span className="tagline">SAMLAD BYGGEXPERTIS · STOCKHOLM</span>}
-      </div>
-    </>
+    <img
+      className="brand-logo"
+      src={BASE + 'bopg-navbar-logo.png'}
+      alt={`${company.wordmark[0]} & ${company.wordmark[1]}`}
+      // Bildens verkliga pixelmått. Webbläsaren kan därmed räkna ut höjden ur
+      // bredden innan filen laddats, så navbaren har rätt höjd från första
+      // målningen och ingenting hoppar.
+      width="1440"
+      height="288"
+      decoding="async"
+    />
   );
 }

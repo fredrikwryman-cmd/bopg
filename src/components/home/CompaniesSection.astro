@@ -7,12 +7,16 @@
 // Att avsändaren ligger kvar medan bolagen passerar är hela poängen: det är
 // gruppen som håller ihop dem.
 //
-// DATADRIVET. Allt som ska fyllas i senare ligger i `companies` nedan: nummer,
-// namn, beskrivning, status, href och accentfärg. När `href` får ett värde blir
-// hela panelen en riktig <a> som öppnas i samma flik, pilen tänds och pekaren
-// blir en hand. Med href: null renderas panelen som <div> — ingen tom länk,
-// ingen falsk affordans, och statusen står som text (inte som död knapp).
-// Layout och animation behöver inte röras.
+// DATADRIVET. Allt som ska fyllas i ligger i `companies` nedan: nummer, namn,
+// beskrivning, status, href och accentfärg — plus två VALFRIA fält, `category`
+// och `facts`. Saknas de renderas de inte alls, och kortet ser ut precis som
+// förut. Det är därför de tre platshållarna kan stå kvar orörda medan det
+// första kortet är fullt utrustat.
+//
+// När `href` får ett värde blir hela panelen en riktig <a> som öppnas i samma
+// flik, pilen tänds och pekaren blir en hand. Med href: null renderas panelen
+// som <div> — ingen tom länk, ingen falsk affordans, och statusen står som
+// text (inte som död knapp). Layout och animation behöver inte röras.
 //
 // GRUNDTILLSTÅNDET ÄR EN VANLIG LISTA. Ingen opacity: 0 och ingen absolut
 // positionering finns i grund-CSS:en. Utan JavaScript, vid minskad rörelse, på
@@ -36,12 +40,16 @@ import { company } from '../../data/company.js';
 const companies = [
   {
     number: '01',
-    name: 'AD Byggprojekt',
-    description: 'Entreprenad — nybyggnation, renovering och totalentreprenad.',
-    status: 'Länk tillkommer',
-    // Sätt adressen här när den är permanent. Inget annat behöver ändras.
-    href: null,
-    accent: 'gold',
+    name: 'AD Byggprojekt Stockholm AB',
+    // category och facts är valfria. De tre korten nedan saknar dem och
+    // renderar därför varken mikroetikett eller faktarad.
+    category: 'Byggledning · Platsledning · Projektledning',
+    description:
+      'Erfaren styrning av byggprojekt från start till mål – med kvalitet, arbetsmiljö och ekonomi i fokus.',
+    facts: ['30+ års erfarenhet', 'Stockholm · Uppsala'],
+    status: 'Besök webbplatsen',
+    href: 'https://adbyggprojekt.se',
+    accent: 'blue',
   },
   {
     number: '02',
@@ -123,9 +131,17 @@ const total = String(companies.length).padStart(2, '0');
                   <span class="company-ghost" aria-hidden="true">{c.number}</span>
                   <span class="company-idx mono">{c.number}</span>
                   <h3 class="company-name">{c.name}</h3>
+                  {c.category && <span class="company-category mono">{c.category}</span>}
                   <p class="company-text">{c.description}</p>
+                  {c.facts && (
+                    <ul class="company-facts">
+                      {c.facts.map((f) => (
+                        <li>{f}</li>
+                      ))}
+                    </ul>
+                  )}
                   <span class="company-foot">
-                    <span class="company-status mono">{c.href ? 'Till sajten' : c.status}</span>
+                    <span class="company-status mono">{c.status}</span>
                     <span class="company-arrow" aria-hidden="true">&rarr;</span>
                   </span>
                   <span class="company-accent" aria-hidden="true"></span>
@@ -331,7 +347,10 @@ const total = String(companies.length).padStart(2, '0');
 
   .company-panel {
     position: relative;
-    display: block;
+    /* Kolumn, inte block: foten ska kunna skjutas ned till panelens underkant
+       med margin-top: auto. Se kommentaren vid .company-foot. */
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     padding: clamp(1.5rem, 2.6vw, 2.2rem) clamp(1.5rem, 2.8vw, 2.4rem);
     background: var(--white);
@@ -392,22 +411,77 @@ const total = String(companies.length).padStart(2, '0');
     color: var(--ink);
   }
 
+  /* MIKROETIKETTEN. Verbalt en underrubrik, visuellt en bisats: samma
+     monotypsnitt och teckenavstånd som resten av sajtens etiketter, men i
+     muted — inte i accentfärgen. Accenten bär redan numret, linjen och pilen,
+     och en fjärde accentfärgad rad hade gjort kortet rastlöst. */
+  .company-category {
+    position: relative;
+    display: block;
+    margin-top: .55rem;
+    font-size: .66rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
   .company-text {
     position: relative;
-    margin-top: 0.7rem;
+    margin-top: .8rem;
     max-width: 30rem;
     font-size: 0.98rem;
     line-height: 1.65;
     color: var(--slate);
   }
 
+  /* FAKTARADEN. Två korta uppgifter längst ned, avskilda med en hårfin linje —
+     inte statistikrutor. Måtten är medvetet mindre än brödtextens: de ska
+     bekräfta, inte konkurrera. Den lilla fyrkanten i accentfärgen är samma
+     markör som förtroenderaden i hero använder, så de två läses som samma
+     sorts uppgift. */
+  .company-facts {
+    position: relative;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem 1.4rem;
+    margin-top: clamp(.9rem, 1.8vw, 1.2rem);
+    padding-top: clamp(.8rem, 1.6vw, 1rem);
+    border-top: 1px solid var(--line);
+  }
+  .company-facts li {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    font-family: 'Space Mono', monospace;
+    font-size: .68rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .company-facts li::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    background: var(--accent);
+    flex: none;
+  }
+
+  /* FOTEN LÄNGST NED, INTE DIREKT EFTER TEXTEN. margin-top: auto trycker ned
+     den till panelens underkant när det finns plats över — det är det som gör
+     att status och pil hamnar på samma höjd i alla fyra korten trots att de
+     innehåller olika mycket. padding-top behåller minimiavståndet till texten
+     ovanför när det INTE finns plats över, alltså i listläget. */
   .company-foot {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    margin-top: clamp(1rem, 2vw, 1.5rem);
+    margin-top: auto;
+    padding-top: clamp(1rem, 2vw, 1.5rem);
   }
 
   .company-status {
@@ -569,6 +643,14 @@ const total = String(companies.length).padStart(2, '0');
     display: grid;
     gap: 0;
   }
+  /* Panelerna fyller hela stapelcellen, som är lika hög som det högsta kortet.
+     Utan det blev de kortare platshållarna helt dolda bakom kort 01 så fort det
+     fick kategori och faktarad: de ligger 7 % ned per djup, och 7 % av det höga
+     kortet är mer än skillnaden i höjd. Då försvann stapelns skymtande kanter,
+     alltså hela djupet i sektionen. */
+  .companies.is-enhanced .company-panel {
+    height: 100%;
+  }
   .companies.is-enhanced .company-card {
     grid-area: 1 / 1;
     /* GSAP skriver transform varje bildruta; transformen ska räknas från
@@ -601,14 +683,18 @@ const total = String(companies.length).padStart(2, '0');
      undre som "nästa", inte som en andra rubrik. Fortfarande fullt läsbar —
      det är opacitet på redan mörk text mot ljus yta, inte grått på grått. */
   .companies.is-enhanced .company-card:not(.is-active) .company-idx,
+  .companies.is-enhanced .company-card:not(.is-active) .company-category,
   .companies.is-enhanced .company-card:not(.is-active) .company-text,
+  .companies.is-enhanced .company-card:not(.is-active) .company-facts,
   .companies.is-enhanced .company-card:not(.is-active) .company-status,
   .companies.is-enhanced .company-card:not(.is-active) .company-arrow {
     opacity: 0.55;
   }
   .companies.is-enhanced .company-accent,
   .companies.is-enhanced .company-idx,
+  .companies.is-enhanced .company-category,
   .companies.is-enhanced .company-text,
+  .companies.is-enhanced .company-facts,
   .companies.is-enhanced .company-status,
   .companies.is-enhanced .company-name {
     transition:
@@ -628,6 +714,15 @@ const total = String(companies.length).padStart(2, '0');
     .companies-stage {
       padding-left: 1.3rem;
       padding-right: 1.3rem;
+    }
+    /* Under 600 px ryms inte de två uppgifterna bredvid varandra utan att den
+       andra bryts mitt itu. De staplas i stället, med luft emellan. */
+    .company-facts {
+      flex-direction: column;
+      gap: .5rem;
+    }
+    .company-category {
+      letter-spacing: .16em;
     }
   }
 

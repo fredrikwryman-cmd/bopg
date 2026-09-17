@@ -39,7 +39,14 @@ const projekt = [
     <!-- grayscale av: komponenten avfärgar vilande paneler, men
          platshållarna är redan ritade i sajtens palett och blev bara gråa av
          det. Nedtoningen av de vilande panelerna sköts av overlayen i stället,
-         så blått förblir blått. -->
+         så blått förblir blått.
+
+         TIMINGEN. Panelerna ska snäppa, inte glida. Alla fyra panelerna
+         animeras redan från position 0 i samma tidslinje, så de rör sig
+         tillsammans — stagger rör bara etikettens två delar (linjen och
+         texten) och la 60 ms på svansen. Den är nollad, så etiketten landar
+         samtidigt som bredden. duration 0.45 med power4.out ger en kurva som
+         är i stort sett framme långt före sitt slut. -->
     <div class="projects-stage">
       <AccordionGallery
         client:visible
@@ -54,6 +61,9 @@ const projekt = [
         overlayColor="var(--ink)"
         textColor="var(--paper)"
         grayscale={false}
+        duration={0.45}
+        stagger={0}
+        ease="power4.out"
       />
     </div>
   </div>

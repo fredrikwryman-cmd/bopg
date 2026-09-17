@@ -781,10 +781,13 @@ a.citem:hover .ci { background: rgba(31,78,150,.14); }
 
 /* ---------- ankare ----------
    Den fixerade headern är ca 120 px hög och skulle annars lägga sig över
-   rubriken på det avsnitt man just hoppat till. #bolag står med flit inte
-   här: den sektionen är en sticky scen som ska börja exakt vid sin egen
-   överkant, och en marginal hade skjutit scenen nedåt i vyn. */
-#process, #kontakt, #om { scroll-margin-top: 7rem; }
+   rubriken på det avsnitt man just hoppat till.
+
+   #bolag ligger numera på logotypslingan, en vanlig sektion, och behöver
+   därför marginalen. Tidigare satt ankaret på bolagssektionens sticky scen,
+   som skulle börja exakt vid sin egen överkant — då hade en marginal skjutit
+   scenen nedåt i vyn. */
+#bolag, #projekt, #process, #kontakt, #om { scroll-margin-top: 7rem; }
 
 /* ---------- entré ----------
    Sajtens gemensamma introrörelse. CSS-animation, inte JS: den spelas även med
